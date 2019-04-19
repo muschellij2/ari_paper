@@ -1,0 +1,199 @@
+% !TeX root = RJwrapper.tex
+\title{The Automated R Instructor}
+\author{by Sean Kross, John Muschelli, Jeffrey T. Leek}
+
+\maketitle
+
+\abstract{%
+An abstract of less than 150 words.
+}
+
+% Any extra LaTeX you need in the preamble
+
+\hypertarget{introduction}{%
+\subsection{Introduction}\label{introduction}}
+
+Videos are a large way people learn. Creating videos of an speaker with
+slides take time, energy, and usually a bit if video editing skills. A
+large issue with such videos is that updating the materials either
+requires remaking the entire video or extensive editing and splicing of
+new segments. We present \CRANpkg{ari}, the automated R instructor to
+mitigate these issues by creating reproducible presentations and videos
+that can be automatically generated. By using Ari we hope to be able to
+rapidly create and update video content.
+
+Multiple open source tools for video editing and splicing exist. The
+\texttt{ffmpeg} software is highly powerful, has been thoroughly tested,
+and has been developed for over XX years.
+
+\hypertarget{technical-stuff}{%
+\subsection{Technical stuff}\label{technical-stuff}}
+
+The \pkg{ari} package relies on \href{https://ffmpeg.org/}{FFmpeg}
+(\textgreater{}= 3.2.4) to interleave the images and the audio files.
+
+\hypertarget{amazon-authetication}{%
+\subsection{Amazon authetication}\label{amazon-authetication}}
+
+The \pkg{ari} package relies on the \CRANpkg{tuneR} package for reading
+and manipulating audio files such as MP3 and WAV files. The voice
+synthesis is done by Amazon Polly, which is a text to speech voice
+generation engine with over XX languages, implemented in the
+\CRANpkg{aws.polly} package. In addition to multiple languages, Amazon
+Polly provides voices of different gender within the same language, as
+well as different dialects such as American English.
+
+In order to use Amazon Polly, you must set up R to use Amazon Web
+Services, which we have provided as a tutorial
+\href{http://seankross.com/2017/05/02/Access-Amazon-Web-Services-in-R.html}{here}.
+In order to test the authentication, you can run
+\texttt{aws.polly::list\_voices()}.
+
+\hypertarget{making-videos-with-ari}{%
+\subsection{\texorpdfstring{Making videos with
+\texttt{ari}}{Making videos with ari}}\label{making-videos-with-ari}}
+
+Videos can be produced form \texttt{ari} using an HTML slide
+presentation based in RMarkdown, where the script is in the HTML
+comments, or a simple vector of images and paragraphs.
+
+The main function is \texttt{ari\_spin}, which takes in a set of images
+and a series of paragraphs of text. These paragraphs are the ``script''
+that is spoken over the images to create the output video. The number of
+paragraphs need to be equal to the number of images. The output video
+format is MP4 by default, but can be any format that the \texttt{ffmpeg}
+installation codecs support. Supported codecs can be founded using the
+functions \texttt{ffmpeg\_audio\_codecs} and
+\texttt{ffmpeg\_video\_codecs}.
+
+The main workhorse of \pkg{ari} is the \texttt{ari\_stitch} function.
+This function takes in a vector of images and a series of Wav audio
+objects or audio filenames.\\
+We have tested the videos on YouTube and the Coursera platform.
+Additional video specifications can be applied to \texttt{ffmpeg\_opts}
+argument of \texttt{ari\_stitch}.
+
+\hypertarget{accessibility}{%
+\subsection{Accessibility}\label{accessibility}}
+
+With respect to accessibility, as \pkg{ari} has the direct script that
+was spoken, this provides for direct subtitles for those hard of hearing
+rather than relying on other services, such as YouTube, to provide a
+speech to text translation. Though some changes to the script are
+required for AMazon Polly to correctly pronounce the information, these
+can be changed using regular expressions in the script, and then passed
+to \texttt{ari\_subtitles}.
+
+\hypertarget{future-directions}{%
+\subsection{Future directions}\label{future-directions}}
+
+We believe the heavy reliance on an \texttt{ffmpeg} installation can be
+mitigated in the future with advances in the \pkg{av} package. Though
+the \pkg{av} package has powerful functionality and is currently porting
+more from \texttt{libav} and therefore \texttt{ffmpeg}, it currently
+does not have the capabilities requried for \pkg{ari}. Although third
+party installation from \url{https://ffmpeg.org/} can be burdensome to a
+user, package managers such as \texttt{brew} for OSX and \texttt{choco}
+for Windows provide installations.
+
+Although we rely on Amazon Polly for voice synthesis, other packages
+provide voice synthesis, such as \CRANpkg{mscstts} for Microsoft and
+\CRANpkg{googleLanguageR} for Google. We aim to harmonize these
+synthesis options, so that users can choose to create videos with the
+services that they support or have access to.
+
+Scripts can be automatically translated into other languages with
+services like the \href{https://cloud.google.com/translate/docs/}{Google
+Translation API}, which \pkg{googleLanguageR} provides an interface.
+Amazon Polly can speak languages other than English. This means you can
+write a lecture once and generate slides and videos in multiple
+languages.
+
+\hypertarget{examples-from-readme---edit}{%
+\subsection{Examples (FROM README -
+edit)}\label{examples-from-readme---edit}}
+
+These examples make use of the \texttt{ari\_example()} function. In
+order to view the files mentioned here you should use
+\texttt{file.show(ari\_example("{[}file\ name{]}"))}. You can watch an
+example of a video produced by Ari
+\href{https://youtu.be/dcIUu4GCOKU}{here}.
+
+\begin{verbatim}
+library(ari)
+
+# First set up your AWS keys
+Sys.setenv("AWS_ACCESS_KEY_ID" = "EA6TDV7ASDE9TL2WI6RJ",
+           "AWS_SECRET_ACCESS_KEY" = "OSnwITbMzcAwvHfYDEmk10khb3g82j04Wj8Va4AA",
+           "AWS_DEFAULT_REGION" = "us-east-2")
+
+# Create a video from a Markdown file and slides
+ari_narrate(
+  ari_example("ari_intro_script.md"),
+  ari_example("ari_intro.html"),
+  voice = "Joey")
+
+# Create a video from an R Markdown file with comments and slides
+ari_narrate(
+  ari_example("ari_comments.Rmd"),
+  ari_example("ari_intro.html"),
+  voice = "Kendra")
+
+# Create a video from images and strings
+ari_spin(
+  ari_example(c("mab1.png", "mab2.png")),
+  c("This is a graph.", "This is another graph"),
+  voice = "Joanna")
+
+# Create a video from images and Waves
+library(tuneR)
+ari_stitch(
+  ari_example(c("mab1.png", "mab2.png")),
+  list(noise(), noise()))
+\end{verbatim}
+
+\hypertarget{rmarkdownhtml-slide-problems}{%
+\subsubsection{RMarkdown/HTML slide
+Problems}\label{rmarkdownhtml-slide-problems}}
+
+Some html slides take a bit to render on webshot, and can be dark gray
+instead of white. If you change the \texttt{delay} argument in
+\texttt{ari\_narrate}, passed to \texttt{webshot}, this can resolve some
+issues, but may take a bit longer to run. Also, using
+\texttt{capture\_method\ =\ "vectorized"} is faster, but may have some
+issues, so run with \texttt{capture\_method\ =\ "iterative"} if this is
+the case as so:
+
+\begin{verbatim}
+ari_narrate(
+  ari_example("ari_comments.Rmd"),
+  ari_example("ari_intro.html"),
+  voice = "Kendra",
+  delay = 0.5,
+  capture_method = "iterative")
+\end{verbatim}
+
+\bibliography{RJreferences}
+
+
+\address{%
+Sean Kross\\
+UCSD\\
+line 1\\ line 2\\
+}
+\href{mailto:author1@work}{\nolinkurl{author1@work}}
+
+\address{%
+John Muschelli\\
+Affiliation\\
+line 1\\ line 2\\
+}
+\href{mailto:author2@work}{\nolinkurl{author2@work}}
+
+\address{%
+Jeffrey T. Leek\\
+Affiliation\\
+line 1\\ line 2\\
+}
+\href{mailto:author2@work}{\nolinkurl{author2@work}}
+
