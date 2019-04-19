@@ -1,0 +1,58 @@
+---
+title: The Automated R Instructor
+author:
+  - name: Sean Kross
+    affiliation: UCSD
+    address:
+    - line 1
+    - line 2
+    email:  author1@work
+  - name: John Muschelli
+    affiliation: Affiliation
+    address:
+    - line 1
+    - line 2
+    email:  author2@work
+abstract: >
+  An abstract of less than 150 words.
+output:
+  rticles::rjournal_article:
+    includes:
+      in_header: preamble.tex
+---
+
+## Introduction
+
+Videos are a large way people learn.  Creating videos of an speaker with slides take time, energy, and usually a bit if video editing skills.  A large issue with such videos is that updating the materials either requires remaking the entire video or extensive editing and splicing of new segments.  We present \CRANpkg{ari}, the automated R instructor to mitigate these issues by creating reproducible presentations and videos that can be automatically generated.  
+
+Multiple open source tools for video editing and splicing exist.  The `ffmpeg` software is highly powerful, has been thoroughly tested, and has been developed for over XX years.  The \pkg{ari} package relies on `ffmpeg` to interleave the spoken word
+
+## Technical stuff
+
+The \pkg{ari} package relies on the \CRANpkg{tuneR} package for reading and manipulating audio files such as MP3 and WAV files.  The voice synthesis is done by Amazon Polly, which is a text to speech voice generation engine with over XX languages, implemented in the \CRANpkg{aws.polly} package.  In addition to multiple languages, Amazon Polly provides voices of different gender within the same language, as well as different dialects such as American English. 
+
+With respect to accessibility, as \pkg{ari} has the direct script that was spoken, this provides for direct subtitles for those hard of hearing rather than relying on other services, such as YouTube, to provide a speech to text translation.  Though some changes to the script are required for AMazon Polly to correctly pronounce the information, these can be changed using regular expressions in the script, and then passed to `ari_subtitles`.  
+
+
+The main function is `ari_spin`, which takes in a set of images and a series of paragraphs of text.  These paragraphs are the "script" that is spoken over the images to create the output video.   The number of paragraphs need to be equal to the number of images. 
+The output video format is MP4 by default, but can be any format that the `ffmpeg` installation codecs support.  Supported codecs can be founded using the functions `ffmpeg_audio_codecs` and `ffmpeg_video_codecs`.
+
+
+The main workhorse of \pkg{ari} is the `ari_stitch` function.  This function takes in a vector of images and a series of Wav audio objects or audio filenames.  
+We have tested the videos on YouTube and the Coursera platform.  Additional video specifications can be applied to `ffmpeg_opts` argument of `ari_stitch`.
+
+
+
+## Future directions
+
+We believe the heavy reliance on an `ffmpeg` installation can be mitigated in the future with advances in the \pkg{av} package.  Though the \pkg{av} package has powerful functionality and is currently porting more from `libav` and therefore `ffmpeg`, it currently does not have the capabilities requried for \pkg{ari}.  Although third party installation from https://ffmpeg.org/ can be burdensome to a user, package managers such as `brew` for OSX and `choco` for Windows provide installations. 
+
+
+
+
+## Summary
+
+This file is only a basic article template. For full details of _The R Journal_ style and information on how to prepare your article for submission, see the [Instructions for Authors](https://journal.r-project.org/share/author-guide.pdf).
+
+
+\bibliography{RJreferences}
