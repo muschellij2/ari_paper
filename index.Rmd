@@ -2,64 +2,240 @@
 title: The Automated R Instructor
 author:
   - name: Sean Kross
-    affiliation: UCSD
+    affiliation: Cognitive Science, University of California, San Diego
     address:
-    - line 1
-    - line 2
+    - 9500 Gilman Dr. 
+    - La Jolla, CA 92093
     email:  author1@work
   - name: John Muschelli
-    affiliation: Affiliation
+    affiliation: Department of Biostatistics, Johns Hopkins Bloomberg School of Public Health
     address:
-    - line 1
-    - line 2
-    email:  author2@work
+    - 615 N Wolfe Street
+    - Baltimore, MD 21231
+    email:  jmusche1@jhu.edu
   - name: Jeffrey T. Leek
-    affiliation: Affiliation
+    affiliation: Department of Biostatistics, Johns Hopkins Bloomberg School of Public Health
     address:
-    - line 1
-    - line 2
-    email:  author2@work    
+    - 615 N Wolfe Street
+    - Baltimore, MD 21231
+    email:  jtleek@jhu.edu
 abstract: >
-  An abstract of less than 150 words.
+  We present the `ari` package for video generation with audio overlaid.  The goal of the package is to be able to generate reproducible videos, likely with the goal of education.  We present an example of generating videos with RMarkdown slide decks with inline comments as the spoken script.  
 output:
   rticles::rjournal_article:
     includes:
       in_header: preamble.tex
+bibliography: "RJreferences.bib"
 ---
 
 ## Introduction
 
-Videos are a large way people learn.  Creating videos of an speaker with slides take time, energy, and usually a bit if video editing skills.  A large issue with such videos is that updating the materials either requires remaking the entire video or extensive editing and splicing of new segments.  We present \CRANpkg{ari}, the automated R instructor to mitigate these issues by creating reproducible presentations and videos that can be automatically generated.  By using Ari we hope to be able to rapidly create
-and update video content.
+Videos are a crucial way people learn.  Creating videos of an speaker with slides take time, energy, and usually a bit if video editing skills.  A large issue with such videos is that updating the materials either requires remaking the entire video or extensive editing and splicing of new segments.  We present \CRANpkg{ari}, the automated R instructor to mitigate these issues by creating reproducible presentations and videos that can be automatically generated.  By using \pkg{ari} we hope to be able to rapidly create and update video content.
 
-Multiple open source tools for video editing and splicing exist.  The `ffmpeg` software is highly powerful, has been thoroughly tested, and has been developed for over XX years.  
+```{r echo = FALSE, message=FALSE}
+library(rvest)
+library(dplyr)
+library(text2speech)
+library("knitcitations")
+cleanbib()
+doc = xml2::read_html("https://docs.aws.amazon.com/polly/latest/dg/voicelist.html")
+tab = doc %>% 
+  html_table()
+tab = tab[[2]]
+dialects = unique(tab$Language)
+languages = sub(", .*", "", dialects)
+languages = sub(" .*", "", languages)
+languages = languages %>% 
+  trimws %>% 
+  unique()
+```
 
-## Technical stuff
-
-The \pkg{ari} package relies on [FFmpeg](https://ffmpeg.org/) (>= 3.2.4) to interleave the images and the audio files.
-
-## Amazon authetication
+The premise of the \pkg{ari} package is that you have visual content (e.g. slides, figures) and you want to explain them with words (i.e. a script) in a video.  Voice synthesizer services are available from [Google](https://cloud.google.com/text-to-speech/), [Microsoft](https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/), and [Amazon](https://aws.amazon.com/polly/).  Many of these synthesizers take make use of deep learning methods, such as WaveNet [@van2016wavenet].  Currently in \pkg{ari}, synthesis of the the audio from the script is done by [Amazon Polly](https://aws.amazon.com/polly/), which is a text to speech voice generation engine with over `r length(languages)` languages, including a total of `r length(dialects)` dialects, implemented in the \CRANpkg{aws.polly} package `r citep(citation("aws.polly"))`.  In addition to multiple languages, Amazon Polly provides voices of different genders within the same language.  Amazon Polly API has a 1500 character limit when synthesizing audio; \pkg{ari} splices scripts into sufficiently-small chunks and creates the audio.  The \pkg{ari} package relies on the \CRANpkg{tuneR} package for reading and manipulating audio output to combine split audio files and to add pauses to audio files between slides `r citep(citation("tuneR"))`. 
 
 
-The \pkg{ari} package relies on the \CRANpkg{tuneR} package for reading and manipulating audio files such as MP3 and WAV files.  The voice synthesis is done by Amazon Polly, which is a text to speech voice generation engine with over XX languages, implemented in the \CRANpkg{aws.polly} package.  In addition to multiple languages, Amazon Polly provides voices of different gender within the same language, as well as different dialects such as American English. 
+Once the audio is generated, it much be spliced with the images to make the video.  Multiple open source tools for video editing and splicing exist.  The `ffmpeg` (http://www.ffmpeg.org/) software is highly powerful, has been thoroughly tested, and has been developed for almost 20 years; \pkg{ari} uses `ffmpeg` to overlay the images over the audio.  We have tested the videos on YouTube and the Coursera platform viewers.  A default specification is used in \pkg{ari}, such as bitrate, audio and video codecs used, and output video format. Additional video specifications can be applied to command-line arguments `ffmpeg` through \pkg{ari}.
 
-In order to use Amazon Polly, you must set up R to use Amazon Web Services, which we have provided as a tutorial [here](http://seankross.com/2017/05/02/Access-Amazon-Web-Services-in-R.html).  In order to test the authentication, you can run `aws.polly::list_voices()`.  
+With these tools together, we can generate educational videos.  The scripts for these videos can be stored in plain text, and therefore be version controlled.  If the figures are created in a reproducible framework, such as generated using R code, the entire video can be reproducibly created and automatically updated.  Thus, \pkg{ari} is the Automated R Instructor.
+<!-- `ffmpeg_opts` argument of `ari_stitch`. -->
+
+## Synthesizer authentication
+
+Though one can generate the spoken audio in many ways, such as deep learning, we will use the aforementioned services as they have direct APIs for use.  The downside of using such services is that users must go through steps to provide authentication, whereas most of these APIs and the associated R packages do not allow for interactive authentication such as OAuth.  
+
+In order to use \pkg{ari}, one must set up R to use Amazon Polly through Amazon Web Services, which uses \CRANpkg{aws.signature} for authentication  `r citep(citation("aws.signature"))`.  The  \pkg{aws.signature} documentation provides options and steps to create the relevant credentials; we have also provided an additional [tutorial](http://seankross.com/2017/05/02/Access-Amazon-Web-Services-in-R.html).  In order to test the authentication required for \pkg{ari}, you can run `aws.polly::list_voices()`.  If the output is a `data.frame` of language naems and language codes, then the authentication has been successful.  The `aws.polly::synthesize` function powers the backend authentication.  NB: Amazon Polly is a paid service, but has a free tier for the first year (https://aws.amazon.com/polly/pricing/).  
 
 ## Making videos with `ari`
 
-Videos can be produced form `ari` using an HTML slide presentation based in RMarkdown, where the script is in the HTML comments, or a simple vector of images and paragraphs.
+Videos can be produced form \pkg{ari} using a simple set of images and a script, a Google Slide deck with the script in the notes section, or an HTML slide presentation based in RMarkdown, where the script is in the HTML comments.  
 
-The main function is `ari_spin`, which takes in a set of images and a series of paragraphs of text.  These paragraphs are the "script" that is spoken over the images to create the output video.   The number of paragraphs need to be equal to the number of images. 
-The output video format is MP4 by default, but can be any format that the `ffmpeg` installation codecs support.  Supported codecs can be founded using the functions `ffmpeg_audio_codecs` and `ffmpeg_video_codecs`.
+The main workhorse of \pkg{ari} is the `ari_stitch` function.  This function takes in a vector of images and a series of Wav audio objects or audio filenames.  Though most times a user has the text script and needs to generate the audio narration, this function is useful if the text to speech generation is done using another service, such as Google in the \CRANpkg{googleLanguageR} package or Microsoft in the \CRANpkg{mscstts} package  `r citep(c(citation("googleLanguageR"), citation("mscstts")))`. 
+
+In the example below, we take 2 example plots, `mab1.png` and `mab2.png`, included in \pkg{ari} and overlay white noise over them in a video.  The `ari_example` function is used as a thin wrapper for `system.file` to get the paths of the plots.
+
+```{r, message = FALSE}
+library(tuneR)
+library(ari)
+result = ari_stitch(
+  ari_example(c("mab1.png", "mab2.png")),
+  list(noise(), noise()),
+  output = "noise.mp4")
+isTRUE(result)
+outfile = attributes(result)$outfile
+```
+
+The output is a logical indicator of success and the path of the output file.  The video for this output can be seen at [YOUTUBE link]().  
 
 
-The main workhorse of \pkg{ari} is the `ari_stitch` function.  This function takes in a vector of images and a series of Wav audio objects or audio filenames.  
-We have tested the videos on YouTube and the Coursera platform.  Additional video specifications can be applied to `ffmpeg_opts` argument of `ari_stitch`.
+
+Given that most users have not generated their own audio, the `ari_spin` function takes in a character vector of images and a character vector of text (`paragraphs` argument) and generates the audio along with the video.  This text is the "script" that is spoken over the images to create the output video.  The number of elements in the text need to be equal to the number of images.  The output video format is MP4 by default, but can be any format (aka "muxers") that the `ffmpeg` installation support, see `ari::ffmpeg_muxers`.  Supported codecs can be founded using the functions `ffmpeg_audio_codecs` and `ffmpeg_video_codecs`.
+
+
+Let us take the Mercutio's speech from Shakespeare's Romeo and Juliet [@shakespeare2003romeo] and overlay it on the same images:
+
+```{r, echo = TRUE}
+speech =  c("I will now perform the Mercutio's speech from Shakespeare's Romeo and Juliet.", 
+         "O, then, I see Queen Mab hath been with you.
+She is the fairies' midwife, and she comes
+In shape no bigger than an agate-stone
+On the fore-finger of an alderman,
+Drawn with a team of little atomies
+Athwart men's noses as they lies asleep;
+Her wagon-spokes made of long spinners' legs,
+The cover of the wings of grasshoppers,
+The traces of the smallest spider's web,
+The collars of the moonshine's wat'ry beams,
+Her whip of cricket's bone; the lash of film;
+Her waggoner a small grey-coated gnat,
+Not half so big as a round little worm
+Pricked from the lazy finger of a maid:
+Her chariot is an empty hazelnut
+Made by the joiner squirrel or old grub,
+Time out o' mind the fairies' coachmakers.
+And in this state she gallops night by night
+Through lovers' brains, and then they dream of love;
+O'er courtiers' knees, that dream on court'sies straight,
+O'er lawyers' fingers, who straight dream on fees,
+O'er ladies' lips, who straight on kisses dream,
+Which oft the angry Mab with blisters plagues,
+Because their breaths with sweetmeats tainted are:
+Sometime she gallops o'er a courtier's nose,
+And then dreams he of smelling out a suit;
+And sometime comes she with a tithe-pig's tail
+Tickling a parson's nose as a' lies asleep,
+Then dreams, he of another benefice:
+Sometime she driveth o'er a soldier's neck,
+And then dreams he of cutting foreign throats,
+Of breaches, ambuscadoes, Spanish blades,
+Of healths five-fathom deep; and then anon
+Drums in his ear, at which he starts and wakes,
+And being thus frighted swears a prayer or two
+And sleeps again. This is that very Mab
+That plaits the manes of horses in the night,
+And bakes the elflocks in foul sluttish hairs,
+Which once untangled, much misfortune bodes:
+This is the hag, when maids lie on their backs,
+That presses them and learns them first to bear,
+Making them women of good carriage:
+This is she-")
+length(speech)
+nchar(speech)
+```
+
+Here we see that the second element of `speech` is above the 1500 character limit for Amazon Polly, and \pkg{ari} breaks it up accordingly.  We will generate the video, but must provide a voice that will be used for the text.  The voices are language-dependent; here we show the voices available for US English for Amazon: 
+
+```{r, echo = FALSE}
+text2speech::tts_voices(service = "amazon") %>% 
+  filter(grepl("en", language_code))
+```
+
+```{r}
+aws.polly::list_voices(language = "en-US") %>% 
+  select(Id, LanguageCode)
+```
+
+Here we can generate the video with the `Joanna` voice:
+
+```{r, echo = TRUE, eval = FALSE}
+shakespeare_result = ari_spin(
+  ari_example(c("mab1.png", "mab2.png")),
+  speech, output = "romeo.mp4", voice = "Joanna")
+isTRUE(shakespeare_result)
+```
+
+```{r, echo = FALSE, eval = TRUE}
+output = "romeo.mp4"
+if (!file.exists(output)) {
+  res = ffmpeg_audio_codecs()
+  fdk_enabled = grepl("fdk", res[ res$codec == "aac", "codec_name"])
+  if (fdk_enabled) {
+    audio_codec = "libfdk_aac"
+  } else {
+    audio_codec = "aac"
+  }
+  run_voice = "Joanna"
+  ari_spin(
+    ari_example(c("mab1.png", "mab2.png")),
+    speech, output = output, voice = run_voice,
+    service = "amazon",
+    audio_codec = audio_codec)
+}
+```
+
+The video for this output can be seen at [YOUTUBE link](). Though the voice generation is relatively clear, we would not classify the speech as passionate or with a high level of emphasis.  Thus, be believe these videos may be best used for conveying information or education.   We can also generate the video using the voice `Brian`, which is an English Great Britain voice:
+
+```{r, echo = TRUE, eval = FALSE}
+gb_result = ari_spin(
+  ari_example(c("mab1.png", "mab2.png")),
+  speech, output = "romeo_gb.mp4", voice = "Brian")
+isTRUE(gb_result)
+```
+
+```{r, echo = FALSE, eval = TRUE}
+output = "romeo_gb.mp4"
+if (!file.exists(output)) {
+  res = ffmpeg_audio_codecs()
+  fdk_enabled = grepl("fdk", res[ res$codec == "aac", "codec_name"])
+  if (fdk_enabled) {
+    audio_codec = "libfdk_aac"
+  } else {
+    audio_codec = "aac"
+  }
+  run_voice = "Brian"
+  ari_spin(
+    ari_example(c("mab1.png", "mab2.png")),
+    speech, output = output, voice =  run_voice,
+    service = "amazon",
+    audio_codec = audio_codec)
+}
+```
+
+For most users, we believe the most natural setting is that the user has a slide deck using RMarkdown, for example using the \CRANpkg{rmarkdown} or \CRANpkg{xaringan} packages `r citep(c(citation("rmarkdown"), citation("xaringan")))`.  The HTML slides are rendered using \CRANpkg{webshot} `r citep(citation("webshot"))` and the script is located in HTML comments (i.e. between `<!--` and `-->`).  This setup allows for one plain text, version-controllable, integrated document that can reproducibly generate a video.  
+
+Some HTML slides take a bit to render on \pkg{webshot}; for example may be rendered dark gray instead of white.  If you change the `delay` argument in `ari_narrate`, passed to \pkg{webshot}, this can resolve some issues by allowing the page to fully render, but may take a bit longer to run.  Also, the argument `capture_method` allows for the control on how `webshot` is run.  Using the value `vectorized`, webshot is run on the entire slide deck and is faster, but may have some issues.  The value `iterative` runs `webshot` for each slide separately, which can be more robust, but can be slower.  
+
+Users can pass in both the RMarkdown document and the resulting output, or simply the document, and the output will be created using `render` from \pkg{rmarkdown} `r citation("rmarkdown")`. 
+
+```r
+# Create a video from an R Markdown file with comments and slides
+res = ari_narrate(
+  script = ari_example("ari_comments.Rmd"),
+  voice = "Kendra",
+  capture_method = "iterative")
+```
+
+
+
+
 
 ## Accessibility
 
 
 With respect to accessibility, as \pkg{ari} has the direct script that was spoken, this provides for direct subtitles for those hard of hearing rather than relying on other services, such as YouTube, to provide a speech to text translation.  Though some changes to the script are required for AMazon Polly to correctly pronounce the information, these can be changed using regular expressions in the script, and then passed to `ari_subtitles`.  
+
+
+## Technical stuff
+
+The \pkg{ari} package relies on [FFmpeg](https://ffmpeg.org/) (>= 3.2.4) to interleave the images and the audio files.
 
 
 ## Future directions
@@ -70,6 +246,8 @@ Although we rely on Amazon Polly for voice synthesis, other packages provide voi
 
 Scripts can be automatically translated into other languages with services
 like the [Google Translation API](https://cloud.google.com/translate/docs/), which \pkg{googleLanguageR} provides an interface.  Amazon Polly can speak languages other than English. This means you can write a lecture once and generate slides and videos in multiple languages.
+
+We have created a Docker environment (https://github.com/seankross/bologna) with the requirements to create videos using \pkg{ari}.  This Docker image increases the level of reproducibility and can be used to create standalone disk images to create content.
 
 
 ## Examples (FROM README - edit)
@@ -105,17 +283,11 @@ ari_spin(
   ari_example(c("mab1.png", "mab2.png")),
   c("This is a graph.", "This is another graph"),
   voice = "Joanna")
-
-# Create a video from images and Waves
-library(tuneR)
-ari_stitch(
-  ari_example(c("mab1.png", "mab2.png")),
-  list(noise(), noise()))
 ```
 
 ### RMarkdown/HTML slide Problems
 
-Some html slides take a bit to render on webshot, and can be dark gray instead of white.  If you change the `delay` argument in `ari_narrate`, passed to `webshot`, this can resolve some issues, but may take a bit longer to run.  Also, using `capture_method = "vectorized"` is faster, but may have some issues, so run with `capture_method = "iterative"` if this is the case as so:
+
 
 ```r
 ari_narrate(
@@ -126,5 +298,8 @@ ari_narrate(
   capture_method = "iterative")
 ```
 
+```{r, include = FALSE}
+write.bibtex(file = "RJreferences.bib")
+```
 
 \bibliography{RJreferences}
