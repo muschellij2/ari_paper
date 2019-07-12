@@ -51,6 +51,16 @@ languages = languages %>%
   trimws %>% 
   unique()
 
+str_break = function(x, width = 80L) {
+  n = nchar(x)
+  if (n <= width) return(x)
+  n1 = seq(1L, n, by = width)
+  n2 = seq(width, n, by = width)
+  if (n %% width != 0) n2 = c(n2, n)
+  x = substring(x, n1, n2)
+  x = trimws(x)
+}
+
 res = ffmpeg_audio_codecs()
 fdk_enabled = grepl("fdk", res[ res$codec == "aac", "codec_name"])
 if (fdk_enabled) {
@@ -212,6 +222,10 @@ if (!file.exists(output)) {
 
 The output video is located at https://youtu.be/rv9fg_qsqc0.  Some HTML slides take a bit to render on \pkg{webshot}; for example may be rendered dark gray instead of white.  If you change the `delay` argument in `ari_narrate`, passed to \pkg{webshot}, this can resolve some issues by allowing the page to fully render, but may take a bit longer to run.  Also, the argument `capture_method` allows for the control on how `webshot` is run.  Using the value `vectorized`, \pkg{webshot} is run on the entire slide deck and is faster, but may have some issues.  The value `iterative` runs `webshot` for each slide separately, which can be more robust, but can be slower.  
 
+With respect to accessibility, as \pkg{ari} has the synthesized script, this provides for direct subtitles for those hard of hearing rather than relying on other services, such as YouTube, to provide a speech to text translation.  When using `ari_spin`, if the `subtitles` flag is marked true, then an SRT file will be output with the video.
+
+One issue with synthesis of technical information is that changes to the script are required for Amazon Polly or other services to provide a correct pronunciation.  For example, if you want the service to say "RStudio" or "ggplot2", the script should say "R Studio" and "g g plot 2".  Thus, you may want to make edits to the subtitle file before uploading.  
+
 In order to create a video from a Google Slide deck or PowerPoint presentation, the slides should be converted to a set of images, likely PNGs.  In order to get the script for the video, we suggest putting the script for each slide in the notes section of that slide.  We have built some of this additional functionality for video generation in our package \pkg{didactr} (https://github.com/muschellij2/didactr).  The notes of slides can be extracted using \CRANpkg{rgoogleslides} [@rgoogleslides] for Google Slides via the API or using \CRANpkg{readOffice}/\CRANpkg{officer} [@officer; @readOffice] to read from PowerPoint documents. Google Slides can be downloaded as PDF and converted to PNGs using the \CRANpkg{pdftools} package  [@pdftools].  The \pkg{didactr} package also has a `pptx_notes` function for reading PowerPoint notes and wraps most of the functionality for conversion.  Converting from PowerPoint to PDF can be done using LibreOffice, which \CRANpkg{docxtractr} [@docxtractr] has wrapper functions to achieve this.
 
 To demonstrate this, we use an example PowerPoint is located on Figshare (https://figshare.com/articles/Example_PowerPoint_for_ari/8865230).  We can convert the PowerPoint to PDF, then to a set of PNG images, then extract the notes.
@@ -228,16 +242,20 @@ notes
 pptx = "ari.pptx"
 pngs = c("ari_1.png", "ari_2.png")
 notes = didactr::pptx_notes(pptx)
-notes
+show_notes = notes
+names(show_notes) = NULL
+show_notes = sapply(show_notes, str_break)
+colnames(show_notes) = NULL
+show_notes = apply(show_notes, 2, paste, collapse = "\n")
+show_notes = paste0('[', 1:length(show_notes), '] ', '"', show_notes, '"')
+cat(show_notes, sep = '\n\n')
 ```
-
-
 
 We can then render the video with the Kimberly voice.  We use the `divisible_height` argument to ensure the height of the images are divisible by 2, as the `x264` codec we are using requires this:
 
 ```{r, echo = TRUE, eval = FALSE}
 pptx_result = ari_spin(pngs, notes, output = "pptx.mp4", voice = "Kimberly",
-    divisible_height = TRUE)
+    divisible_height = TRUE, subtitles = TRUE)
 isTRUE(pptx_result)
 ```
 
@@ -249,25 +267,22 @@ if (!file.exists(output)) {
     output = output, 
     voice = "Kimberly",
     audio_codec = audio_codec, verbose = 2,
-    divisible_height = TRUE)
+    divisible_height = TRUE, subtitles = TRUE)
 }
 ```
 
-You can see the output at https://youtu.be/TBb3Am6xsQw.  For Google Slides, the slide deck can be downloaded as a PowerPoint and the previous steps can be used; it can also be downloaded directly as a PDF. The \pkg{didactr} package has the function `gs_notes_from_slide` to extract the notes for synthesis.  As this extraction process requires authentication, we will omit it here.
+You can see the output at https://youtu.be/TBb3Am6xsQw.  Here we can see the first few lines of the subtitle file:
 
-## Accessibility
+```{r show_srt, echo = FALSE, eval = TRUE, message=FALSE}
+head(setdiff(readLines("pptx.srt"), ""))
+```
 
-With respect to accessibility, as \pkg{ari} has the direct script that was spoken, this provides for direct subtitles for those hard of hearing rather than relying on other services, such as YouTube, to provide a speech to text translation.  Though some changes to the script are required for AMazon Polly to correctly pronounce the information, these can be changed using regular expressions in the script, and then passed to `ari_subtitles`.  
-
-
-## Technical stuff
-
-The \pkg{ari} package relies on [FFmpeg](https://ffmpeg.org/) (>= 3.2.4) to interleave the images and the audio files.
+For Google Slides, the slide deck can be downloaded as a PowerPoint and the previous steps can be used; it can also be downloaded directly as a PDF. The \pkg{didactr} package has the function `gs_notes_from_slide` to extract the notes for synthesis.  As this extraction process requires authentication, we will omit it here.  Thus, we should be able to create videos using RMarkdown, Google Slides, or PowerPoint presentations in an automatic fashion.
 
 
 ## Future directions
 
-We believe the heavy reliance on an `ffmpeg` installation can be mitigated in the future with advances in the \pkg{av} package.  Though the \pkg{av} package has powerful functionality and is currently porting more from `libav` and therefore `ffmpeg`, it currently does not have the capabilities requried for \pkg{ari}.  Although third party installation from https://ffmpeg.org/ can be burdensome to a user, package managers such as `brew` for OSX and `choco` for Windows provide installations. 
+We believe the heavy reliance on an `ffmpeg` installation can be mitigated in the future with advances in the \pkg{av} package.  Though the \pkg{av} package has powerful functionality and is currently porting more from `libav` and therefore `ffmpeg`, it currently does not have the capabilities required for \pkg{ari}.  Although third party installation from https://ffmpeg.org/ can be burdensome to a user, package managers such as `brew` for OSX and `choco` for Windows provide installations. 
 
 Although we rely on Amazon Polly for voice synthesis, other packages provide voice synthesis, such as \CRANpkg{mscstts} for Microsoft and \CRANpkg{googleLanguageR} for Google.  We aim to harmonize these synthesis options, so that users can choose to create videos with the services that they support or have access to.
 
@@ -277,52 +292,9 @@ like the [Google Translation API](https://cloud.google.com/translate/docs/), whi
 We have created a Docker environment (https://github.com/seankross/bologna) with the requirements to create videos using \pkg{ari}.  This Docker image increases the level of reproducibility and can be used to create standalone disk images to create content.
 
 
-## Examples (FROM README - edit)
+## Conclusions
 
-
-These examples make use of the `ari_example()` function. In order to view the
-files mentioned here you should use `file.show(ari_example("[file name]"))`.
-You can watch an example of a video produced by \pkg{ari} at https://youtu.be/dcIUu4GCOKU.
-
-```R
-library(ari)
-
-# First set up your AWS keys
-Sys.setenv("AWS_ACCESS_KEY_ID" = "EA6TDV7ASDE9TL2WI6RJ",
-           "AWS_SECRET_ACCESS_KEY" = "OSnwITbMzcAwvHfYDEmk10khb3g82j04Wj8Va4AA",
-           "AWS_DEFAULT_REGION" = "us-east-2")
-
-# Create a video from a Markdown file and slides
-ari_narrate(
-  ari_example("ari_intro_script.md"),
-  ari_example("ari_intro.html"),
-  voice = "Joey")
-
-# Create a video from an R Markdown file with comments and slides
-ari_narrate(
-  ari_example("ari_comments.Rmd"),
-  ari_example("ari_intro.html"),
-  voice = "Kendra")
-
-# Create a video from images and strings
-ari_spin(
-  ari_example(c("mab1.png", "mab2.png")),
-  c("This is a graph.", "This is another graph"),
-  voice = "Joanna")
-```
-
-### RMarkdown/HTML slide Problems
-
-
-
-```r
-ari_narrate(
-  ari_example("ari_comments.Rmd"),
-  ari_example("ari_intro.html"),
-  voice = "Kendra",
-  delay = 0.5,
-  capture_method = "iterative")
-```
+The \pkg{ari} package combines multiple open-source tools and APIs to create reproducible workflows for creating videos.  These videos can be created using RMarkdown documents, PowerPoint presentations, Google Slide decks, or simply series of images.  The audio overlaid on the images can be separate or contained within the storage of the images.  These workflows can then be reproduced in the future and easily updated.  As the current voice synthesis options are somewhat limited in the tenacity and inflection given, we believe that educational and informational videos are the most applicable area.  
 
 ```{r, include = FALSE, eval = FALSE}
 # write.bibtex(file = "RJreferences.bib", append = TRUE)

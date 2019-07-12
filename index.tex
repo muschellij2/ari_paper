@@ -309,6 +309,19 @@ is faster, but may have some issues. The value \texttt{iterative} runs
 \texttt{webshot} for each slide separately, which can be more robust,
 but can be slower.
 
+With respect to accessibility, as \pkg{ari} has the synthesized script,
+this provides for direct subtitles for those hard of hearing rather than
+relying on other services, such as YouTube, to provide a speech to text
+translation. When using \texttt{ari\_spin}, if the \texttt{subtitles}
+flag is marked true, then an SRT file will be output with the video.
+
+One issue with synthesis of technical information is that changes to the
+script are required for Amazon Polly or other services to provide a
+correct pronunciation. For example, if you want the service to say
+``RStudio'' or ``ggplot2'', the script should say ``R Studio'' and ``g g
+plot 2''. Thus, you may want to make edits to the subtitle file before
+uploading.
+
 In order to create a video from a Google Slide deck or PowerPoint
 presentation, the slides should be converted to a set of images, likely
 PNGs. In order to get the script for the video, we suggest putting the
@@ -343,10 +356,11 @@ notes
 
 \begin{Schunk}
 \begin{Soutput}
-                                                                                                                          notesSlide1.xml 
-"Sometimes it’s hard for an instructor to take the time to record their lectures.  For example, I’m in a coffee shop and it may be loud." 
-                                                                                                                          notesSlide2.xml 
-                "Here is an example of a plot with really small axes.  We plot the x versus the y-variables and a smoother between them." 
+[1] "Sometimes it’s hard for an instructor to take the time to record their lectures.
+For example, I’m in a coffee shop and it may be loud."
+
+[2] "Here is an example of a plot with really small axes.  We plot the x versus the y
+-variables and a smoother between them."
 \end{Soutput}
 \end{Schunk}
 
@@ -358,34 +372,32 @@ this:
 \begin{Schunk}
 \begin{Sinput}
 pptx_result = ari_spin(pngs, notes, output = "pptx.mp4", voice = "Kimberly",
-    divisible_height = TRUE)
+    divisible_height = TRUE, subtitles = TRUE)
 isTRUE(pptx_result)
 \end{Sinput}
 \end{Schunk}
 
-You can see the output at \url{https://youtu.be/TBb3Am6xsQw}. For Google
-Slides, the slide deck can be downloaded as a PowerPoint and the
-previous steps can be used; it can also be downloaded directly as a PDF.
-The \pkg{didactr} package has the function
+You can see the output at \url{https://youtu.be/TBb3Am6xsQw}. Here we
+can see the first few lines of the subtitle file:
+
+\begin{Schunk}
+\begin{Soutput}
+[1] "1"                                       
+[2] "00:00:00,000 --> 00:00:02,025"           
+[3] "Sometimes it’s hard for an instructor to"
+[4] "2"                                       
+[5] "00:00:02,025 --> 00:00:04,005"           
+[6] "take the time to record their lectures." 
+\end{Soutput}
+\end{Schunk}
+
+For Google Slides, the slide deck can be downloaded as a PowerPoint and
+the previous steps can be used; it can also be downloaded directly as a
+PDF. The \pkg{didactr} package has the function
 \texttt{gs\_notes\_from\_slide} to extract the notes for synthesis. As
 this extraction process requires authentication, we will omit it here.
-
-\hypertarget{accessibility}{%
-\subsection{Accessibility}\label{accessibility}}
-
-With respect to accessibility, as \pkg{ari} has the direct script that
-was spoken, this provides for direct subtitles for those hard of hearing
-rather than relying on other services, such as YouTube, to provide a
-speech to text translation. Though some changes to the script are
-required for AMazon Polly to correctly pronounce the information, these
-can be changed using regular expressions in the script, and then passed
-to \texttt{ari\_subtitles}.
-
-\hypertarget{technical-stuff}{%
-\subsection{Technical stuff}\label{technical-stuff}}
-
-The \pkg{ari} package relies on \href{https://ffmpeg.org/}{FFmpeg}
-(\textgreater{}= 3.2.4) to interleave the images and the audio files.
+Thus, we should be able to create videos using RMarkdown, Google Slides,
+or PowerPoint presentations in an automatic fashion.
 
 \hypertarget{future-directions}{%
 \subsection{Future directions}\label{future-directions}}
@@ -394,7 +406,7 @@ We believe the heavy reliance on an \texttt{ffmpeg} installation can be
 mitigated in the future with advances in the \pkg{av} package. Though
 the \pkg{av} package has powerful functionality and is currently porting
 more from \texttt{libav} and therefore \texttt{ffmpeg}, it currently
-does not have the capabilities requried for \pkg{ari}. Although third
+does not have the capabilities required for \pkg{ari}. Although third
 party installation from \url{https://ffmpeg.org/} can be burdensome to a
 user, package managers such as \texttt{brew} for OSX and \texttt{choco}
 for Windows provide installations.
@@ -418,55 +430,18 @@ create videos using \pkg{ari}. This Docker image increases the level of
 reproducibility and can be used to create standalone disk images to
 create content.
 
-\hypertarget{examples-from-readme---edit}{%
-\subsection{Examples (FROM README -
-edit)}\label{examples-from-readme---edit}}
+\hypertarget{conclusions}{%
+\subsection{Conclusions}\label{conclusions}}
 
-These examples make use of the \texttt{ari\_example()} function. In
-order to view the files mentioned here you should use
-\texttt{file.show(ari\_example("{[}file\ name{]}"))}. You can watch an
-example of a video produced by \pkg{ari} at
-\url{https://youtu.be/dcIUu4GCOKU}.
-
-\begin{verbatim}
-library(ari)
-
-# First set up your AWS keys
-Sys.setenv("AWS_ACCESS_KEY_ID" = "EA6TDV7ASDE9TL2WI6RJ",
-           "AWS_SECRET_ACCESS_KEY" = "OSnwITbMzcAwvHfYDEmk10khb3g82j04Wj8Va4AA",
-           "AWS_DEFAULT_REGION" = "us-east-2")
-
-# Create a video from a Markdown file and slides
-ari_narrate(
-  ari_example("ari_intro_script.md"),
-  ari_example("ari_intro.html"),
-  voice = "Joey")
-
-# Create a video from an R Markdown file with comments and slides
-ari_narrate(
-  ari_example("ari_comments.Rmd"),
-  ari_example("ari_intro.html"),
-  voice = "Kendra")
-
-# Create a video from images and strings
-ari_spin(
-  ari_example(c("mab1.png", "mab2.png")),
-  c("This is a graph.", "This is another graph"),
-  voice = "Joanna")
-\end{verbatim}
-
-\hypertarget{rmarkdownhtml-slide-problems}{%
-\subsubsection{RMarkdown/HTML slide
-Problems}\label{rmarkdownhtml-slide-problems}}
-
-\begin{verbatim}
-ari_narrate(
-  ari_example("ari_comments.Rmd"),
-  ari_example("ari_intro.html"),
-  voice = "Kendra",
-  delay = 0.5,
-  capture_method = "iterative")
-\end{verbatim}
+The \pkg{ari} package combines multiple open-source tools and APIs to
+create reproducible workflows for creating videos. These videos can be
+created using RMarkdown documents, PowerPoint presentations, Google
+Slide decks, or simply series of images. The audio overlaid on the
+images can be separate or contained within the storage of the images.
+These workflows can then be reproduced in the future and easily updated.
+As the current voice synthesis options are somewhat limited in the
+tenacity and inflection given, we believe that educational and
+informational videos are the most applicable area.
 
 \bibliography{RJreferences}
 

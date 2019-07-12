@@ -1,0 +1,28 @@
+1
+00:00:00,000 --> 00:00:02,025
+Sometimes it’s hard for an instructor to
+
+2
+00:00:02,025 --> 00:00:04,005
+take the time to record their lectures.
+
+3
+00:00:04,005 --> 00:00:06,075
+For example, I’m in a coffee shop and it
+
+4
+00:00:06,075 --> 00:00:09,000
+may be loud.
+
+5
+00:00:09,000 --> 00:00:11,666
+Here is an example of a plot with really
+
+6
+00:00:11,666 --> 00:00:14,333
+small axes.  We plot the x versus the
+
+7
+00:00:14,333 --> 00:00:17,000
+y-variables and a smoother between them.
+
