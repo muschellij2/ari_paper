@@ -60,13 +60,13 @@ powerful, has been thoroughly tested, and has been developed for almost
 audio. The output videos have been tested on multiple platforms,
 including the YouTube and Coursera players. A default specification is
 used in \pkg{ari}, such as bitrate, audio and video codecs used, and
-output video format. GThe numerous additional video specifications can
-be applied to command-line arguments \texttt{ffmpeg} through \pkg{ari}.
+output video format. The numerous additional video specifications can be
+applied to command-line arguments \texttt{ffmpeg} through \pkg{ari}.
 
 With these tools together, we can generate automated videos; we have
-used it for educational videos. The spoken scripts for these videos can
-be stored in plain text, and therefore be version controlled, edited,
-and updated easily. If the figures are created in a reproducible
+used \pkg{ari} for educational videos. The spoken scripts for these
+videos can be stored in plain text, and therefore be version controlled,
+edited, and updated easily. If the figures are created in a reproducible
 framework, such as generated using R code, the entire video can be
 reproducibly created and automatically updated. Thus, \pkg{ari} is the
 Automated R Instructor. We will provide examples of creating videos
@@ -78,13 +78,13 @@ presentation.
 \subsection{\texorpdfstring{Making videos with
 \texttt{ari}}{Making videos with ari}}\label{making-videos-with-ari}}
 
-The main workhorse of \pkg{ari} is the \texttt{ari\_stitch} function. In
-this simple example, we assume we already have audio to overlay on some
-images. The \texttt{ari\_stitch} function takes the audio and images,
-and ``stitches'' them together using \texttt{ffmpeg}. In order to use
-\pkg{ari}, one must have an \texttt{ffmpeg} installation to combine the
-audio and images, which can be obtained at \url{https://ffmpeg.org/}. In
-the example below, 2 images are overlaid withe white noise for
+The main workhorse of \pkg{ari} is the \texttt{ari\_stitch} function.
+This function requires the audio to overlay on some images to have
+already been generated. The \texttt{ari\_stitch} function takes the
+audio and images, and ``stitches'' them together using \texttt{ffmpeg}.
+In order to use \pkg{ari}, one must have an \texttt{ffmpeg} installation
+to combine the audio and images. In the example below, 2 images
+(packaged with \pkg{ari}) are overlaid withe white noise for
 demonstration. This example also allows users to check if the output of
 \texttt{ffmpeg} works with a desired video player.
 
@@ -99,11 +99,14 @@ result = ari_stitch(
 isTRUE(result)
 \end{Sinput}
 \begin{Soutput}
-#> [1] TRUE
+[1] TRUE
 \end{Soutput}
 \begin{Sinput}
-outfile = attributes(result)$outfile
+attributes(result)$outfile
 \end{Sinput}
+\begin{Soutput}
+[1] "/Users/johnmuschelli/Dropbox/Papers/ari_paper/noise.mp4"
+\end{Soutput}
 \end{Schunk}
 
 The output is a logical indicator of success and the path of the output
@@ -142,125 +145,230 @@ the first year (\url{https://aws.amazon.com/polly/pricing/}).
 \subsection{\texorpdfstring{Making videos with
 \texttt{ari}}{Making videos with ari}}\label{making-videos-with-ari-1}}
 
-After the steps above, videos can be using the \texttt{ari\_spin}
-function with a set of images and of text. This text is the ``script''
-that is spoken over the images to create the output video. The number of
-elements in the text need to be equal to the number of images. Let us
-take the Mercutio's speech from Shakespeare's Romeo and Juliet
-(Shakespeare 2003) and overlay it on the same images:
+After Polly has been authenticated, videos can be using the
+\texttt{ari\_spin} function with a set of images and of text. This text
+is the ``script'' that is spoken over the images to create the output
+video. The number of elements in the text need to be equal to the number
+of images. Let us take a part of Mercutio's speech from Shakespeare's
+Romeo and Juliet (Shakespeare 2003) and overlay it on 2 images from the
+Wikipedia page about Mercutio
+(\url{https://en.wikipedia.org/wiki/Mercutio}):
 
 \begin{Schunk}
 \begin{Sinput}
 speech =  c(
   "I will now perform part of Mercutio's speech from Shakespeare's Romeo and Juliet.", 
   "O, then, I see Queen Mab hath been with you.
-She is the fairies' midwife, and she comes
-In shape no bigger than an agate-stone
-On the fore-finger of an alderman,
-Drawn with a team of little atomies
-Athwart men's noses as they lies asleep;")
+   She is the fairies' midwife, and she comes
+   In shape no bigger than an agate-stone
+   On the fore-finger of an alderman,
+   Drawn with a team of little atomies
+   Athwart men's noses as they lies asleep;")
+mercutio_file = "death_of_mercutio.png"
+mercutio_file2 = "mercutio_actor.png"
 \end{Sinput}
 \end{Schunk}
 
 \begin{Schunk}
 \begin{Sinput}
 shakespeare_result = ari_spin(
-  ari_example(c("mab1.png", "mab2.png")),
+  c(mercutio_file, mercutio_file2),
   speech, output = "romeo.mp4", voice = "Joanna")
 isTRUE(shakespeare_result)
 \end{Sinput}
 \end{Schunk}
 
-The speech output can be seen at \url{https://youtu.be/ZCClmUv95iY}. We
+The speech output can be seen at \url{https://youtu.be/SFhvM9gI0kE} . We
 chose the voice ``Joanna'' to the the female US-English speaker for the
 script. The voices are language-dependent; we can see the available
 voices for English for Amazon Polly below (from
 \url{https://docs.aws.amazon.com/polly/latest/dg/SupportedLanguage.html}):
 
 \begin{Schunk}
-\begin{Soutput}
-#>       voice           language language_code gender service
-#> 1   Russell Australian English         en-AU   Male  amazon
-#> 2    Nicole Australian English         en-AU Female  amazon
-#> 3      Emma    British English         en-GB Female  amazon
-#> 4     Brian    British English         en-GB   Male  amazon
-#> 5       Amy    British English         en-GB Female  amazon
-#> 6   Raveena     Indian English         en-IN Female  amazon
-#> 7     Aditi     Indian English         en-IN Female  amazon
-#> 8     Salli         US English         en-US Female  amazon
-#> 9   Matthew         US English         en-US   Male  amazon
-#> 10 Kimberly         US English         en-US Female  amazon
-#> 11   Kendra         US English         en-US Female  amazon
-#> 12   Justin         US English         en-US   Male  amazon
-#> 13     Joey         US English         en-US   Male  amazon
-#> 14   Joanna         US English         en-US Female  amazon
-#> 15      Ivy         US English         en-US Female  amazon
-#> 16  Geraint      Welsh English     en-GB-WLS   Male  amazon
-\end{Soutput}
+
+\begin{tabular}{l|l|l|l|l}
+\hline
+voice & language & language\_code & gender & service\\
+\hline
+Russell & Australian English & en-AU & Male & amazon\\
+\hline
+Nicole & Australian English & en-AU & Female & amazon\\
+\hline
+Amy & British English & en-GB & Female & amazon\\
+\hline
+Brian & British English & en-GB & Male & amazon\\
+\hline
+Emma & British English & en-GB & Female & amazon\\
+\hline
+Raveena & Indian English & en-IN & Female & amazon\\
+\hline
+Aditi & Indian English & en-IN & Female & amazon\\
+\hline
+Salli & US English & en-US & Female & amazon\\
+\hline
+Joanna & US English & en-US & Female & amazon\\
+\hline
+Matthew & US English & en-US & Male & amazon\\
+\hline
+Ivy & US English & en-US & Female & amazon\\
+\hline
+Justin & US English & en-US & Male & amazon\\
+\hline
+Kendra & US English & en-US & Female & amazon\\
+\hline
+Kimberly & US English & en-US & Female & amazon\\
+\hline
+Joey & US English & en-US & Male & amazon\\
+\hline
+Geraint & Welsh English & en-GB-WLS & Male & amazon\\
+\hline
+\end{tabular}
+
 \end{Schunk}
 
 Though the voice generation is relatively clear, we would not classify
 the speech as passionate or with a high level of emphasis. Thus, be
 believe these videos may be best used for conveying information or
-education. We can also generate the video using the voice
-\texttt{Brian}, which is an British English male voice:
+education as opposed to entertainment. We can also generate the video
+using the voice \texttt{Brian}, which is an British English male voice:
 
 \begin{Schunk}
 \begin{Sinput}
 gb_result = ari_spin(
-  ari_example(c("mab1.png", "mab2.png")),
+  c(mercutio_file, mercutio_file2),
   speech, output = "romeo_gb.mp4", voice = "Brian")
 isTRUE(gb_result)
 \end{Sinput}
 \end{Schunk}
 
-The speech output can be seen at \url{https://youtu.be/VuaeRKvs-Y4}. The
+The speech output can be seen at \url{https://youtu.be/fSS0JSb4VxM}. The
 output video format is MP4 by default, but can be any format (aka
-``muxers'') that the \texttt{ffmpeg} installation support, see
-\texttt{ari::ffmpeg\_muxers}. Supported codecs can be founded using the
-functions \texttt{ffmpeg\_audio\_codecs} and
+``muxers'') that the \texttt{ffmpeg} installation support, see the
+function \texttt{ffmpeg\_muxers}. Supported codecs can be founded using
+the functions \texttt{ffmpeg\_audio\_codecs} and
 \texttt{ffmpeg\_video\_codecs}. The images and script can be presented
 in a number of ways, such as a text file and a series of PNG images.
 More likely, the images and script will be bundled together, such as a
-Google Slide deck/Powerpoint presentation with the script in the notes
+Google Slide deck/PowerPoint presentation with the script in the notes
 section, or an HTML slide presentation based in RMarkdown, where the
 script is in the HTML comments.
-
-\hypertarget{stopped-here}{%
-\subsection{\#stopped here}\label{stopped-here}}
 
 For most R users, we believe the most natural setting is that the user
 has a slide deck using RMarkdown, for example using the
 \CRANpkg{rmarkdown} or \CRANpkg{xaringan} packages (Allaire et al. 2019;
-Xie, Allaire, and Grolemund 2018; Xie 2018). The HTML slides are
-rendered using \CRANpkg{webshot} (Chang 2018) and the script is located
-in HTML comments (i.e.~between \texttt{\textless{}!-\/-} and
-\texttt{-\/-\textgreater{}}). This setup allows for one plain text,
-version-controllable, integrated document that can reproducibly generate
-a video.
+Xie, Allaire, and Grolemund 2018; Xie 2018). In \pkg{ari}, the HTML
+slides are rendered using \CRANpkg{webshot} (Chang 2018) and the script
+is located in HTML comments (i.e.~between \texttt{\textless{}!-\/-} and
+\texttt{-\/-\textgreater{}}). For example, in the
+\texttt{ari\_comments.Rmd}, which is a \texttt{ioslides} type of
+markdown slide deck, we have the last slide:
 
-Some HTML slides take a bit to render on \pkg{webshot}; for example may
-be rendered dark gray instead of white. If you change the \texttt{delay}
-argument in \texttt{ari\_narrate}, passed to \pkg{webshot}, this can
-resolve some issues by allowing the page to fully render, but may take a
-bit longer to run. Also, the argument \texttt{capture\_method} allows
-for the control on how \texttt{webshot} is run. Using the value
-\texttt{vectorized}, webshot is run on the entire slide deck and is
-faster, but may have some issues. The value \texttt{iterative} runs
-\texttt{webshot} for each slide separately, which can be more robust,
-but can be slower.
+\begin{Schunk}
+\begin{Sinput}
+x = readLines(ari_example("ari_comments.Rmd"))
+tail(x[ x != ""], 4)
+\end{Sinput}
+\begin{Soutput}
+[1] "## Conclusion"                                             
+[2] "<!--"                                                      
+[3] "Thank you for watching this video and good luck using Ari!"
+[4] "-->"                                                       
+\end{Soutput}
+\end{Schunk}
+
+so that the script for this slide starts with \texttt{"Thank\ you"}.
+This setup allows for one plain text, version-controllable, integrated
+document that can reproducibly generate a video. We believe these
+features allow creators to make agile vidoes, that can easily be updated
+with new material or changed when errors or typos are found.
 
 Users can pass in both the RMarkdown document and the resulting output,
 or simply the document, and the output will be created using
-\texttt{render} from \pkg{rmarkdown} (Allaire et al. 2019).
+\texttt{render} from \pkg{rmarkdown} (Allaire et al. 2019). Here we
+create the video for \texttt{ari\_comments.Rmd}:
 
-\begin{verbatim}
+\begin{Schunk}
+\begin{Sinput}
 # Create a video from an R Markdown file with comments and slides
 res = ari_narrate(
   script = ari_example("ari_comments.Rmd"),
   voice = "Kendra",
   capture_method = "iterative")
-\end{verbatim}
+\end{Sinput}
+\end{Schunk}
+
+The output video is located at \url{https://youtu.be/rv9fg_qsqc0}. Some
+HTML slides take a bit to render on \pkg{webshot}; for example may be
+rendered dark gray instead of white. If you change the \texttt{delay}
+argument in \texttt{ari\_narrate}, passed to \pkg{webshot}, this can
+resolve some issues by allowing the page to fully render, but may take a
+bit longer to run. Also, the argument \texttt{capture\_method} allows
+for the control on how \texttt{webshot} is run. Using the value
+\texttt{vectorized}, \pkg{webshot} is run on the entire slide deck and
+is faster, but may have some issues. The value \texttt{iterative} runs
+\texttt{webshot} for each slide separately, which can be more robust,
+but can be slower.
+
+In order to create a video from a Google Slide deck or PowerPoint
+presentation, the slides should be converted to a set of images, likely
+PNGs. In order to get the script for the video, we suggest putting the
+script for each slide in the notes section of that slide. We have built
+some of this additional functionality for video generation in our
+package \pkg{didactr} (\url{https://github.com/muschellij2/didactr}).
+The notes of slides can be extracted using \CRANpkg{rgoogleslides}
+(Noorazman 2018) for Google Slides via the API or using
+\CRANpkg{readOffice}/\CRANpkg{officer} (Gohel 2019; Ewing 2017) to read
+from PowerPoint documents. Google Slides can be downloaded as PDF and
+converted to PNGs using the \CRANpkg{pdftools} package (Ooms 2019). The
+\pkg{didactr} package also has a \texttt{pptx\_notes} function for
+reading PowerPoint notes and wraps most of the functionality for
+conversion. Converting from PowerPoint to PDF can be done using
+LibreOffice, which \CRANpkg{docxtractr} (Rudis and Muir, n.d.) has
+wrapper functions to achieve this.
+
+To demonstrate this, we use an example PowerPoint is located on Figshare
+(\url{https://figshare.com/articles/Example_PowerPoint_for_ari/8865230}).
+We can convert the PowerPoint to PDF, then to a set of PNG images, then
+extract the notes.
+
+\begin{Schunk}
+\begin{Sinput}
+pptx = "ari.pptx"
+pdf = docxtractr::convert_to_pdf(pptx)
+pngs = pdftools::pdf_convert(pdf, dpi = 300)
+notes = didactr::pptx_notes(pptx)
+notes
+\end{Sinput}
+\end{Schunk}
+
+\begin{Schunk}
+\begin{Soutput}
+                                                                                                                          notesSlide1.xml 
+"Sometimes it’s hard for an instructor to take the time to record their lectures.  For example, I’m in a coffee shop and it may be loud." 
+                                                                                                                          notesSlide2.xml 
+                "Here is an example of a plot with really small axes.  We plot the x versus the y-variables and a smoother between them." 
+\end{Soutput}
+\end{Schunk}
+
+We can then render the video with the Kimberly voice. We use the
+\texttt{divisible\_height} argument to ensure the height of the images
+are divisible by 2, as the \texttt{x264} codec we are using requires
+this:
+
+\begin{Schunk}
+\begin{Sinput}
+pptx_result = ari_spin(pngs, notes, output = "pptx.mp4", voice = "Kimberly",
+    divisible_height = TRUE)
+isTRUE(pptx_result)
+\end{Sinput}
+\end{Schunk}
+
+You can see the output at \url{https://youtu.be/TBb3Am6xsQw}. For Google
+Slides, the slide deck can be downloaded as a PowerPoint and the
+previous steps can be used; it can also be downloaded directly as a PDF.
+The \pkg{didactr} package has the function
+\texttt{gs\_notes\_from\_slide} to extract the notes for synthesis. As
+this extraction process requires authentication, we will omit it here.
 
 \hypertarget{accessibility}{%
 \subsection{Accessibility}\label{accessibility}}
@@ -317,8 +425,8 @@ edit)}\label{examples-from-readme---edit}}
 These examples make use of the \texttt{ari\_example()} function. In
 order to view the files mentioned here you should use
 \texttt{file.show(ari\_example("{[}file\ name{]}"))}. You can watch an
-example of a video produced by Ari
-\href{https://youtu.be/dcIUu4GCOKU}{here}.
+example of a video produced by \pkg{ari} at
+\url{https://youtu.be/dcIUu4GCOKU}.
 
 \begin{verbatim}
 library(ari)
@@ -378,6 +486,14 @@ Edmondson, Mark. 2019. \emph{googleLanguageR: Call Google's 'Natural
 Language' API, 'Cloud Translation' API, 'Cloud Speech' API and 'Cloud
 Text-to-Speech' API}.
 
+\leavevmode\hypertarget{ref-readOffice}{}%
+Ewing, Mark. 2017. \emph{readOffice: Read Text Out of Modern Office
+Files}. \url{https://CRAN.R-project.org/package=readOffice}.
+
+\leavevmode\hypertarget{ref-officer}{}%
+Gohel, David. 2019. \emph{officer: Manipulation of Microsoft Word and
+PowerPoint Documents}. \url{https://CRAN.R-project.org/package=officer}.
+
 \leavevmode\hypertarget{ref-aws.polly}{}%
 Leeper, Thomas J. 2017. \emph{aws.polly: Client for AWS Polly}.
 
@@ -398,6 +514,20 @@ Cognitive Services 'Text-to-Speech' REST API}.
 \leavevmode\hypertarget{ref-text2speech}{}%
 ---------. 2019b. \emph{text2speech: Text to Speech}.
 \url{https://github.com/muschellij2/text2speech}.
+
+\leavevmode\hypertarget{ref-rgoogleslides}{}%
+Noorazman, Hairizuan Bin. 2018. \emph{rgoogleslides: R Interface to
+Google Slides}. \url{https://CRAN.R-project.org/package=rgoogleslides}.
+
+\leavevmode\hypertarget{ref-pdftools}{}%
+Ooms, Jeroen. 2019. \emph{pdftools: Text Extraction, Rendering and
+Converting of PDF Documents}.
+\url{https://CRAN.R-project.org/package=pdftools}.
+
+\leavevmode\hypertarget{ref-docxtractr}{}%
+Rudis, Bob, and Chris Muir. n.d. \emph{docxtractr: Extract Data Tables
+and Comments from Microsoft Word Documents}.
+\url{http://gitlab.com/hrbrmstr/docxtractr}.
 
 \leavevmode\hypertarget{ref-shakespeare2003romeo}{}%
 Shakespeare, William. 2003. \emph{Romeo and Juliet}. Cambridge

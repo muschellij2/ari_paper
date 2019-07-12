@@ -33,9 +33,11 @@ bibliography: "RJreferences.bib"
 Videos are a crucial way people learn and pervasive in online education platforms.  Creating videos of a speaker with slides take time, energy, and usually video editing skills.  A large issue with such videos is that updating the materials either requires remaking the entire video or extensive editing and splicing of new segments.  We present \CRANpkg{ari}, the automated R instructor to mitigate these issues by creating reproducible presentations and videos that can be automatically generated.  By using \pkg{ari}, we provide a tools for users to rapidly create and update video content.
 
 ```{r echo = FALSE, message=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = "")
 library(rvest)
 library(dplyr)
 library(text2speech)
+library(ari)
 library("knitcitations")
 cleanbib()
 doc = xml2::read_html("https://docs.aws.amazon.com/polly/latest/dg/voicelist.html")
@@ -48,22 +50,30 @@ languages = sub(" .*", "", languages)
 languages = languages %>% 
   trimws %>% 
   unique()
+
+res = ffmpeg_audio_codecs()
+fdk_enabled = grepl("fdk", res[ res$codec == "aac", "codec_name"])
+if (fdk_enabled) {
+  audio_codec = "libfdk_aac"
+} else {
+  audio_codec = "aac"
+}
 ```
 
 The premise of the \pkg{ari} package is that you have visual content (e.g. slides, figures) and you want to explain them with words (i.e. a script) in a video.  Voice synthesizer services are available from [Google](https://cloud.google.com/text-to-speech/), [Microsoft](https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/), and [Amazon](https://aws.amazon.com/polly/).  Many of these synthesizers take make use of deep learning methods, such as WaveNet [@van2016wavenet] and have interfaces in R [@googleLanguageR; @mscstts; @aws.polly].  Currently in \pkg{ari}, synthesis of the the audio can be rendered using any of these services through the \CRANpkg{text2speech} [@text2speech].  The default is [Amazon Polly](https://aws.amazon.com/polly/), which has text to speech voice generation in over `r length(languages)` languages, including a total of `r length(dialects)` dialects, implemented in the \CRANpkg{aws.polly} package [@aws.polly].  In addition to multiple languages, the speech generation services provide voices of different genders within the same language.  We present the \pkg{ari} package with reproducible use case examples and the video outputs with different voices in multiple languages.
 
 
-The \pkg{ari} package relies on the \CRANpkg{tuneR} package for reading and manipulating audio output to combine split audio files and to add pauses to audio files between slides [@tuneR].  Once the audio is generated, it much be spliced with the images to make the video.  Multiple open source tools for video editing and splicing exist.  The `ffmpeg` (http://www.ffmpeg.org/) software is highly powerful, has been thoroughly tested, and has been developed for almost 20 years; \pkg{ari} uses `ffmpeg` to overlay the images over the audio. The output videos have been tested on multiple platforms, including the YouTube and Coursera players.  A default specification is used in \pkg{ari}, such as bitrate, audio and video codecs used, and output video format. GThe numerous additional video specifications can be applied to command-line arguments `ffmpeg` through \pkg{ari}.
+The \pkg{ari} package relies on the \CRANpkg{tuneR} package for reading and manipulating audio output to combine split audio files and to add pauses to audio files between slides [@tuneR].  Once the audio is generated, it much be spliced with the images to make the video.  Multiple open source tools for video editing and splicing exist.  The `ffmpeg` (http://www.ffmpeg.org/) software is highly powerful, has been thoroughly tested, and has been developed for almost 20 years; \pkg{ari} uses `ffmpeg` to overlay the images over the audio. The output videos have been tested on multiple platforms, including the YouTube and Coursera players.  A default specification is used in \pkg{ari}, such as bitrate, audio and video codecs used, and output video format. The numerous additional video specifications can be applied to command-line arguments `ffmpeg` through \pkg{ari}.
 
-With these tools together, we can generate automated videos; we have used it for educational videos.  The spoken scripts for these videos can be stored in plain text, and therefore be version controlled, edited, and updated easily.  If the figures are created in a reproducible framework, such as generated using R code, the entire video can be reproducibly created and automatically updated.  Thus, \pkg{ari} is the Automated R Instructor.  We will provide examples of creating videos based on a slide deck in RMarkdown, a set of images and a script, and discuss how to create slides using a Google Slide deck or PowerPoint presentation.
+With these tools together, we can generate automated videos; we have used \pkg{ari} for educational videos.  The spoken scripts for these videos can be stored in plain text, and therefore be version controlled, edited, and updated easily.  If the figures are created in a reproducible framework, such as generated using R code, the entire video can be reproducibly created and automatically updated.  Thus, \pkg{ari} is the Automated R Instructor.  We will provide examples of creating videos based on a slide deck in RMarkdown, a set of images and a script, and discuss how to create slides using a Google Slide deck or PowerPoint presentation.
 <!-- `ffmpeg_opts` argument of `ari_stitch`. -->
 
 
 ## Making videos with `ari`
 
-The main workhorse of \pkg{ari} is the `ari_stitch` function.  In this simple example, we assume we already have audio to overlay on some images. The `ari_stitch` function takes the audio and images, and "stitches" them together using `ffmpeg`.  In order to use \pkg{ari}, one must have an `ffmpeg` installation to combine the audio and images, which can be obtained at https://ffmpeg.org/.  In the example below, 2 images are overlaid withe white noise for demonstration.  This example also allows users to check if the output of `ffmpeg` works with a desired video player.
+The main workhorse of \pkg{ari} is the `ari_stitch` function.  This function requires the audio to overlay on some images to have already been generated. The `ari_stitch` function takes the audio and images, and "stitches" them together using `ffmpeg`.  In order to use \pkg{ari}, one must have an `ffmpeg` installation to combine the audio and images.  In the example below, 2 images (packaged with \pkg{ari}) are overlaid withe white noise for demonstration.  This example also allows users to check if the output of `ffmpeg` works with a desired video player.
 
-```{r, message = FALSE}
+```{r stitch, message = FALSE}
 library(tuneR)
 library(ari)
 result = ari_stitch(
@@ -71,7 +81,7 @@ result = ari_stitch(
   list(noise(), noise()),
   output = "noise.mp4")
 isTRUE(result)
-outfile = attributes(result)$outfile
+attributes(result)$outfile
 ```
 
 The output is a logical indicator of success and the path of the output file.  The video for this output can be seen at https://youtu.be/3kgaYf-EV90.  
@@ -86,91 +96,100 @@ The \pkg{text2speech} package provides a unified interface to these 3 services, 
 
 ## Making videos with `ari`
 
-After the steps above, videos can be using the `ari_spin` function with a set of images and of text.  This text is the "script" that is spoken over the images to create the output video.  The number of elements in the text need to be equal to the number of images.  Let us take the Mercutio's speech from Shakespeare's Romeo and Juliet [@shakespeare2003romeo] and overlay it on the same images:
+After Polly has been authenticated, videos can be using the `ari_spin` function with a set of images and of text.  This text is the "script" that is spoken over the images to create the output video.  The number of elements in the text need to be equal to the number of images.  Let us take a part of Mercutio's speech from Shakespeare's Romeo and Juliet [@shakespeare2003romeo] and overlay it on 2 images from the Wikipedia page about Mercutio (https://en.wikipedia.org/wiki/Mercutio):
 
-```{r, echo = TRUE}
+```{r, echo = TRUE, message=FALSE}
 speech =  c(
   "I will now perform part of Mercutio's speech from Shakespeare's Romeo and Juliet.", 
   "O, then, I see Queen Mab hath been with you.
-She is the fairies' midwife, and she comes
-In shape no bigger than an agate-stone
-On the fore-finger of an alderman,
-Drawn with a team of little atomies
-Athwart men's noses as they lies asleep;")
+   She is the fairies' midwife, and she comes
+   In shape no bigger than an agate-stone
+   On the fore-finger of an alderman,
+   Drawn with a team of little atomies
+   Athwart men's noses as they lies asleep;")
+mercutio_file = "death_of_mercutio.png"
+mercutio_file2 = "mercutio_actor.png"
 ```
+
 ```{r, echo = TRUE, eval = FALSE}
 shakespeare_result = ari_spin(
-  ari_example(c("mab1.png", "mab2.png")),
+  c(mercutio_file, mercutio_file2),
   speech, output = "romeo.mp4", voice = "Joanna")
 isTRUE(shakespeare_result)
 ```
 
-```{r, echo = FALSE, eval = TRUE}
+```{r romeo, echo = FALSE, eval = TRUE, message=FALSE}
+mercutio_file = "death_of_mercutio.png"
+mercutio_file2 = "mercutio_actor.png"
+if (!file.exists(mercutio_file)){
+  mercutio_file_bad = tempfile(fileext = ".png")
+  download.file("https://upload.wikimedia.org/wikipedia/commons/b/bc/Death_of_Mercutio.png?download", 
+                destfile = mercutio_file_bad)
+  res = system2("ffmpeg", args = c("-y", "-i", mercutio_file_bad, mercutio_file))
+}
+if (!file.exists(mercutio_file2)){
+  mercutio_file_bad = tempfile(fileext = ".jpg")
+  download.file("https://upload.wikimedia.org/wikipedia/commons/7/76/Welles-Mercutio-1933.jpg?download", 
+                destfile = mercutio_file_bad)
+  res = system2("ffmpeg", args = c("-y", "-i", mercutio_file_bad, mercutio_file2))
+}
+
 output = "romeo.mp4"
 if (!file.exists(output)) {
-  res = ffmpeg_audio_codecs()
-  fdk_enabled = grepl("fdk", res[ res$codec == "aac", "codec_name"])
-  if (fdk_enabled) {
-    audio_codec = "libfdk_aac"
-  } else {
-    audio_codec = "aac"
-  }
   run_voice = "Joanna"
   ari_spin(
-    ari_example(c("mab1.png", "mab2.png")),
+    c(mercutio_file, mercutio_file2),
     speech, output = output, voice = run_voice,
     service = "amazon",
     audio_codec = audio_codec)
 }
 ```
-
-The speech output can be seen at https://youtu.be/ZCClmUv95iY.  We chose the voice "Joanna" to the the female US-English speaker for the script.  The voices are language-dependent; we can see the available voices for English for Amazon Polly below (from https://docs.aws.amazon.com/polly/latest/dg/SupportedLanguage.html):
+<!-- https://youtu.be/ZCClmUv95iY -->
+The speech output can be seen at https://youtu.be/SFhvM9gI0kE .  We chose the voice "Joanna" to the the female US-English speaker for the script.  The voices are language-dependent; we can see the available voices for English for Amazon Polly below (from https://docs.aws.amazon.com/polly/latest/dg/SupportedLanguage.html):
 
 ```{r, echo = FALSE}
 text2speech::tts_voices(service = "amazon") %>% 
-  filter(grepl("en", language_code))
+  filter(grepl("en", language_code)) %>% 
+  knitr::kable(format = "latex")
 ```
 
-Though the voice generation is relatively clear, we would not classify the speech as passionate or with a high level of emphasis.  Thus, be believe these videos may be best used for conveying information or education.   We can also generate the video using the voice `Brian`, which is an British English male voice:
+Though the voice generation is relatively clear, we would not classify the speech as passionate or with a high level of emphasis.  Thus, be believe these videos may be best used for conveying information or education as opposed to entertainment.   We can also generate the video using the voice `Brian`, which is an British English male voice:
 
 ```{r, echo = TRUE, eval = FALSE}
 gb_result = ari_spin(
-  ari_example(c("mab1.png", "mab2.png")),
+  c(mercutio_file, mercutio_file2),
   speech, output = "romeo_gb.mp4", voice = "Brian")
 isTRUE(gb_result)
 ```
 
-```{r, echo = FALSE, eval = TRUE}
+```{r romeo_gb, echo = FALSE, eval = TRUE}
 output = "romeo_gb.mp4"
 if (!file.exists(output)) {
-  res = ffmpeg_audio_codecs()
-  fdk_enabled = grepl("fdk", res[ res$codec == "aac", "codec_name"])
-  if (fdk_enabled) {
-    audio_codec = "libfdk_aac"
-  } else {
-    audio_codec = "aac"
-  }
   run_voice = "Brian"
   ari_spin(
-    ari_example(c("mab1.png", "mab2.png")),
+    c(mercutio_file, mercutio_file2),
     speech, output = output, voice =  run_voice,
     service = "amazon",
     audio_codec = audio_codec)
 }
 ```
+<!-- https://youtu.be/VuaeRKvs-Y4 -->
+The speech output can be seen at https://youtu.be/fSS0JSb4VxM. The output video format is MP4 by default, but can be any format (aka "muxers") that the `ffmpeg` installation support, see the function `ffmpeg_muxers`.  Supported codecs can be founded using the functions `ffmpeg_audio_codecs` and `ffmpeg_video_codecs`.  The images and script can be presented in a number of ways, such as a text file and a series of PNG images.  More likely, the images and script will be bundled together, such as a Google Slide deck/PowerPoint presentation with the script in the notes section, or an HTML slide presentation based in RMarkdown, where the script is in the HTML comments.  
 
-The speech output can be seen at https://youtu.be/VuaeRKvs-Y4. The output video format is MP4 by default, but can be any format (aka "muxers") that the `ffmpeg` installation support, see `ari::ffmpeg_muxers`.  Supported codecs can be founded using the functions `ffmpeg_audio_codecs` and `ffmpeg_video_codecs`.  The images and script can be presented in a number of ways, such as a text file and a series of PNG images.  More likely, the images and script will be bundled together, such as a Google Slide deck/Powerpoint presentation with the script in the notes section, or an HTML slide presentation based in RMarkdown, where the script is in the HTML comments.  
 
-#stopped here
---------
 
-For most R users, we believe the most natural setting is that the user has a slide deck using RMarkdown, for example using the \CRANpkg{rmarkdown} or \CRANpkg{xaringan} packages [@rmarkdown; @rmarkdownbook; @xaringan].  The HTML slides are rendered using \CRANpkg{webshot} [@webshot] and the script is located in HTML comments (i.e. between `<!--` and `-->`).  This setup allows for one plain text, version-controllable, integrated document that can reproducibly generate a video.  
+For most R users, we believe the most natural setting is that the user has a slide deck using RMarkdown, for example using the \CRANpkg{rmarkdown} or \CRANpkg{xaringan} packages [@rmarkdown; @rmarkdownbook; @xaringan].  In \pkg{ari}, the HTML slides are rendered using \CRANpkg{webshot} [@webshot] and the script is located in HTML comments (i.e. between `<!--` and `-->`).  For example, in the `ari_comments.Rmd`, which is a `ioslides` type of markdown slide deck, we have the last slide:
 
-Some HTML slides take a bit to render on \pkg{webshot}; for example may be rendered dark gray instead of white.  If you change the `delay` argument in `ari_narrate`, passed to \pkg{webshot}, this can resolve some issues by allowing the page to fully render, but may take a bit longer to run.  Also, the argument `capture_method` allows for the control on how `webshot` is run.  Using the value `vectorized`, webshot is run on the entire slide deck and is faster, but may have some issues.  The value `iterative` runs `webshot` for each slide separately, which can be more robust, but can be slower.  
+```{r}
+x = readLines(ari_example("ari_comments.Rmd"))
+tail(x[ x != ""], 4)
+```
+so that the script for this slide starts with `"Thank you"`.  This setup allows for one plain text, version-controllable, integrated document that can reproducibly generate a video.  We believe these features allow creators to make agile vidoes, that can easily be updated with new material or changed when errors or typos are found.
 
-Users can pass in both the RMarkdown document and the resulting output, or simply the document, and the output will be created using `render` from \pkg{rmarkdown} [@rmarkdown].
+Users can pass in both the RMarkdown document and the resulting output, or simply the document, and the output will be created using `render` from \pkg{rmarkdown} [@rmarkdown].  Here we create the video for `ari_comments.Rmd`:
 
-```r
+
+```{r narr_show, eval = FALSE}
 # Create a video from an R Markdown file with comments and slides
 res = ari_narrate(
   script = ari_example("ari_comments.Rmd"),
@@ -178,12 +197,65 @@ res = ari_narrate(
   capture_method = "iterative")
 ```
 
+```{r narrate, echo = FALSE, eval = TRUE}
+output = "narrate_example.mp4"
+if (!file.exists(output)) {
+  res = ari_narrate(
+    script = ari_example("ari_comments.Rmd"),
+    voice = "Kendra",
+    output = output,
+    audio_codec = audio_codec,
+    capture_method = "iterative")
+}
+```
+
+
+The output video is located at https://youtu.be/rv9fg_qsqc0.  Some HTML slides take a bit to render on \pkg{webshot}; for example may be rendered dark gray instead of white.  If you change the `delay` argument in `ari_narrate`, passed to \pkg{webshot}, this can resolve some issues by allowing the page to fully render, but may take a bit longer to run.  Also, the argument `capture_method` allows for the control on how `webshot` is run.  Using the value `vectorized`, \pkg{webshot} is run on the entire slide deck and is faster, but may have some issues.  The value `iterative` runs `webshot` for each slide separately, which can be more robust, but can be slower.  
+
+In order to create a video from a Google Slide deck or PowerPoint presentation, the slides should be converted to a set of images, likely PNGs.  In order to get the script for the video, we suggest putting the script for each slide in the notes section of that slide.  We have built some of this additional functionality for video generation in our package \pkg{didactr} (https://github.com/muschellij2/didactr).  The notes of slides can be extracted using \CRANpkg{rgoogleslides} [@rgoogleslides] for Google Slides via the API or using \CRANpkg{readOffice}/\CRANpkg{officer} [@officer; @readOffice] to read from PowerPoint documents. Google Slides can be downloaded as PDF and converted to PNGs using the \CRANpkg{pdftools} package  [@pdftools].  The \pkg{didactr} package also has a `pptx_notes` function for reading PowerPoint notes and wraps most of the functionality for conversion.  Converting from PowerPoint to PDF can be done using LibreOffice, which \CRANpkg{docxtractr} [@docxtractr] has wrapper functions to achieve this.
+
+To demonstrate this, we use an example PowerPoint is located on Figshare (https://figshare.com/articles/Example_PowerPoint_for_ari/8865230).  We can convert the PowerPoint to PDF, then to a set of PNG images, then extract the notes.
+
+```{r pptx_convert, eval = FALSE, message=FALSE}
+pptx = "ari.pptx"
+pdf = docxtractr::convert_to_pdf(pptx)
+pngs = pdftools::pdf_convert(pdf, dpi = 300)
+notes = didactr::pptx_notes(pptx)
+notes
+```
+
+```{r pptx_convert_run, eval = TRUE, echo = FALSE}
+pptx = "ari.pptx"
+pngs = c("ari_1.png", "ari_2.png")
+notes = didactr::pptx_notes(pptx)
+notes
+```
 
 
 
+We can then render the video with the Kimberly voice.  We use the `divisible_height` argument to ensure the height of the images are divisible by 2, as the `x264` codec we are using requires this:
+
+```{r, echo = TRUE, eval = FALSE}
+pptx_result = ari_spin(pngs, notes, output = "pptx.mp4", voice = "Kimberly",
+    divisible_height = TRUE)
+isTRUE(pptx_result)
+```
+
+```{r pptx_mp4, echo = FALSE, eval = TRUE, message=FALSE}
+output = "pptx.mp4"
+if (!file.exists(output)) {
+  pptx_result = ari_spin(
+    pngs, notes, 
+    output = output, 
+    voice = "Kimberly",
+    audio_codec = audio_codec, verbose = 2,
+    divisible_height = TRUE)
+}
+```
+
+You can see the output at https://youtu.be/TBb3Am6xsQw.  For Google Slides, the slide deck can be downloaded as a PowerPoint and the previous steps can be used; it can also be downloaded directly as a PDF. The \pkg{didactr} package has the function `gs_notes_from_slide` to extract the notes for synthesis.  As this extraction process requires authentication, we will omit it here.
 
 ## Accessibility
-
 
 With respect to accessibility, as \pkg{ari} has the direct script that was spoken, this provides for direct subtitles for those hard of hearing rather than relying on other services, such as YouTube, to provide a speech to text translation.  Though some changes to the script are required for AMazon Polly to correctly pronounce the information, these can be changed using regular expressions in the script, and then passed to `ari_subtitles`.  
 
@@ -210,8 +282,7 @@ We have created a Docker environment (https://github.com/seankross/bologna) with
 
 These examples make use of the `ari_example()` function. In order to view the
 files mentioned here you should use `file.show(ari_example("[file name]"))`.
-You can watch an example of a video produced by Ari
-[here](https://youtu.be/dcIUu4GCOKU).
+You can watch an example of a video produced by \pkg{ari} at https://youtu.be/dcIUu4GCOKU.
 
 ```R
 library(ari)
