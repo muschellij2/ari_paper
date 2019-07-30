@@ -34,13 +34,7 @@ Videos are a crucial way people learn and pervasive in online education platform
 and relevancy of lecture videos focesed on technical subjects like computing
 programming or data science can often require remaking an entire video, requiring extensive editing and splicing of new segments.  We present \CRANpkg{ari}, the **A**utomated **R** **I**nstructor as a tool to address these issues by creating reproducible presentations and videos that can be automatically generated from plain text files or similar artifacts.  By using \pkg{ari}, we provide a tool for users to rapidly create and update video content.
 
-```{r, echo=FALSE}
-languages <- 3
-dialects <- 3
-library(ari)
-```
-
-```{r echo = FALSE, message=FALSE, eval=FALSE}
+```{r echo = FALSE, message=FALSE}
 knitr::opts_chunk$set(echo = TRUE, comment = "")
 library(rvest)
 library(dplyr)
@@ -94,7 +88,7 @@ With these tools together, we can generate automated videos; we have used \pkg{a
 
 The main workhorse of \pkg{ari} is the `ari_stitch` function.  This function requires the audio to overlay on some images to have already been generated. The `ari_stitch` function takes the audio and images, and "stitches" them together using `ffmpeg`.  In order to use \pkg{ari}, one must have an `ffmpeg` installation to combine the audio and images.  In the example below, 2 images (packaged with \pkg{ari}) are overlaid withe white noise for demonstration.  This example also allows users to check if the output of `ffmpeg` works with a desired video player.
 
-```{r stitch, message = FALSE, eval=FALSE}
+```{r stitch, message = FALSE}
 library(tuneR)
 library(ari)
 result = ari_stitch(
@@ -119,7 +113,7 @@ The \pkg{text2speech} package provides a unified interface to these 3 services, 
 
 After Polly has been authenticated, videos can be using the `ari_spin` function with a set of images and of text.  This text is the "script" that is spoken over the images to create the output video.  The number of elements in the text need to be equal to the number of images.  Let us take a part of Mercutio's speech from Shakespeare's Romeo and Juliet [@shakespeare2003romeo] and overlay it on 2 images from the Wikipedia page about Mercutio (https://en.wikipedia.org/wiki/Mercutio):
 
-```{r, echo = TRUE, message=FALSE, eval=FALSE}
+```{r, echo = TRUE, message=FALSE}
 speech =  c(
   "I will now perform part of Mercutio's speech from Shakespeare's Romeo and Juliet.", 
   "O, then, I see Queen Mab hath been with you.
@@ -139,7 +133,7 @@ shakespeare_result = ari_spin(
 isTRUE(shakespeare_result)
 ```
 
-```{r romeo, echo = FALSE, eval = FALSE, message=FALSE}
+```{r romeo, echo = FALSE, eval = TRUE, message=FALSE}
 mercutio_file = "death_of_mercutio.png"
 mercutio_file2 = "mercutio_actor.png"
 if (!file.exists(mercutio_file)){
@@ -168,7 +162,7 @@ if (!file.exists(output)) {
 <!-- https://youtu.be/ZCClmUv95iY -->
 The speech output can be seen at https://youtu.be/SFhvM9gI0kE .  We chose the voice "Joanna" to the the female US-English speaker for the script.  The voices are language-dependent; we can see the available voices for English for Amazon Polly below (from https://docs.aws.amazon.com/polly/latest/dg/SupportedLanguage.html):
 
-```{r, echo = FALSE, eval=FALSE}
+```{r, echo = FALSE}
 text2speech::tts_voices(service = "amazon") %>% 
   filter(grepl("en", language_code)) %>% 
   knitr::kable(format = "latex")
@@ -176,7 +170,6 @@ text2speech::tts_voices(service = "amazon") %>%
 
 Though the voice generation is relatively clear, we would not classify the speech as passionate or with a high level of emphasis.  Thus, be believe these videos may be best used for conveying information for education as opposed to entertainment.   We can also generate the video using the voice `Brian`, which is an British English male voice:
 
-<!--- This eval = FALSE stays FALSE --->
 ```{r, echo = TRUE, eval = FALSE}
 gb_result = ari_spin(
   c(mercutio_file, mercutio_file2),
@@ -184,7 +177,7 @@ gb_result = ari_spin(
 isTRUE(gb_result)
 ```
 
-```{r romeo_gb, echo = FALSE, eval = FALSE}
+```{r romeo_gb, echo = FALSE, eval = TRUE}
 output = "romeo_gb.mp4"
 if (!file.exists(output)) {
   run_voice = "Brian"
@@ -209,8 +202,7 @@ tail(x[ x != ""], 4)
 so that the script for this slide starts with `"Thank you"`.  This setup allows for one plain text, version-controllable, integrated document that can reproducibly generate a video.  We believe these features allow creators to make agile vidoes, that can easily be updated with new material or changed when errors or typos are found.
 
 Users can pass in both the R Markdown document and the resulting output, or simply the document, and the output will be created using `render` from \pkg{rmarkdown} [@rmarkdown].  Here we create the video for `ari_comments.Rmd`:
-
-<!--- This eval = FALSE stays FALSE --->
+s
 ```{r narr_show, eval = FALSE}
 # Create a video from an R Markdown file with comments and slides
 res = ari_narrate(
@@ -220,7 +212,7 @@ res = ari_narrate(
 ```
 
 
-```{r narrate, echo = FALSE, eval = FALSE}
+```{r narrate, echo = FALSE, eval = TRUE}
 output = "narrate_example.mp4"
 if (!file.exists(output)) {
   res = ari_narrate(
@@ -243,7 +235,6 @@ In order to create a video from a Google Slide deck or PowerPoint presentation, 
 
 To demonstrate this, we use an example PowerPoint is located on Figshare (https://figshare.com/articles/Example_PowerPoint_for_ari/8865230).  We can convert the PowerPoint to PDF, then to a set of PNG images, then extract the notes.
 
-<!--- This eval = FALSE stays FALSE --->
 ```{r pptx_convert, eval = FALSE, message=FALSE}
 pptx = "ari.pptx"
 pdf = docxtractr::convert_to_pdf(pptx)
@@ -252,7 +243,7 @@ notes = didactr::pptx_notes(pptx)
 notes
 ```
 
-```{r pptx_convert_run, eval = FALSE, echo = FALSE}
+```{r pptx_convert_run, eval = TRUE, echo = FALSE}
 pptx = "ari.pptx"
 pngs = c("ari_1.png", "ari_2.png")
 notes = didactr::pptx_notes(pptx)
@@ -267,14 +258,13 @@ cat(show_notes, sep = '\n\n')
 
 We can then render the video with the Kimberly voice.  We use the `divisible_height` argument to ensure the height of the images are divisible by 2, as the `x264` codec we are using requires this:
 
-<!--- This eval = FALSE stays FALSE --->
 ```{r, echo = TRUE, eval = FALSE}
 pptx_result = ari_spin(pngs, notes, output = "pptx.mp4", voice = "Kimberly",
     divisible_height = TRUE, subtitles = TRUE)
 isTRUE(pptx_result)
 ```
 
-```{r pptx_mp4, echo = FALSE, eval = FALSE, message=FALSE}
+```{r pptx_mp4, echo = FALSE, eval = TRUE, message=FALSE}
 output = "pptx.mp4"
 if (!file.exists(output)) {
   pptx_result = ari_spin(
@@ -288,12 +278,11 @@ if (!file.exists(output)) {
 
 You can see the output at https://youtu.be/TBb3Am6xsQw.  Here we can see the first few lines of the subtitle file:
 
-```{r show_srt, echo = FALSE, eval = FALSE, message=FALSE}
+```{r show_srt, echo = FALSE, eval = TRUE, message=FALSE}
 head(setdiff(readLines("pptx.srt"), ""))
 ```
 
 For Google Slides, the slide deck can be downloaded as a PowerPoint and the previous steps can be used; it can also be downloaded directly as a PDF. The \pkg{didactr} package has the function `gs_notes_from_slide` to extract the notes for synthesis.  As this extraction process requires authentication, we will omit it here.  Thus, we should be able to create videos using R Markdown, Google Slides, or PowerPoint presentations in an automatic fashion.
-
 
 ## Future directions
 
@@ -311,7 +300,6 @@ We have created a Docker environment (https://github.com/seankross/bologna) with
 
 The \pkg{ari} package combines multiple open-source tools and APIs to create reproducible workflows for creating videos.  These videos can be created using R Markdown documents, PowerPoint presentations, Google Slide decks, or simply series of images.  The audio overlaid on the images can be separate or contained within the storage of the images.  These workflows can then be reproduced in the future and easily updated.  As the current voice synthesis options are somewhat limited in the tenacity and inflection given, we believe that educational and informational videos are the most applicable area.  
 
-<!--- This eval = FALSE stays FALSE --->
 ```{r, include = FALSE, eval = FALSE}
 # write.bibtex(file = "RJreferences.bib", append = TRUE)
 ```
