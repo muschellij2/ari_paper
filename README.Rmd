@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of ari_paper is to showcase the [`ari` package](https://cran.r-project.org/package=ari).  We show how to use each function and the output videos.  This README uses the [`video`](https://github.com/muschellij2/video) package to render videos inside the markdown.
+The goal of ari_paper is to showcase the [`ari` package](https://cran.r-project.org/package=ari).  We show how to use each function and the output videos.  This README uses the [`video`](https://github.com/muschellij2/video) package to render videos inside the markdown.  The paper can be viewed at https://johnmuschelli.com/ari_paper/.
 
 ```{r}
 library(video)

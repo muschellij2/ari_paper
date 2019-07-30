@@ -11,7 +11,8 @@ The goal of ari\_paper is to showcase the [`ari`
 package](https://cran.r-project.org/package=ari). We show how to use
 each function and the output videos. This README uses the
 [`video`](https://github.com/muschellij2/video) package to render videos
-inside the markdown.
+inside the markdown. The paper can be viewed at
+<https://johnmuschelli.com/ari_paper/>.
 
 ``` r
 library(video)
