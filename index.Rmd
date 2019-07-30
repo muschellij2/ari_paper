@@ -202,7 +202,7 @@ tail(x[ x != ""], 4)
 so that the script for this slide starts with `"Thank you"`.  This setup allows for one plain text, version-controllable, integrated document that can reproducibly generate a video.  We believe these features allow creators to make agile vidoes, that can easily be updated with new material or changed when errors or typos are found.
 
 Users can pass in both the R Markdown document and the resulting output, or simply the document, and the output will be created using `render` from \pkg{rmarkdown} [@rmarkdown].  Here we create the video for `ari_comments.Rmd`:
-s
+
 ```{r narr_show, eval = FALSE}
 # Create a video from an R Markdown file with comments and slides
 res = ari_narrate(
