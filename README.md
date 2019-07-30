@@ -31,6 +31,11 @@ attributes(result)$outfile
 
 ## Creating Speech from Text: `ari_spin`
 
+Let us take a part of Mercutio’s speech from Shakespeare’s Romeo and
+Juliet \[@shakespeare2003romeo\] and overlay it on 2 images from the
+Wikipedia page about Mercutio
+(<https://en.wikipedia.org/wiki/Mercutio>):
+
 ``` r
 res = ffmpeg_audio_codecs()
 fdk_enabled = grepl("fdk", res[ res$codec == "aac", "codec_name"])
@@ -49,18 +54,6 @@ speech =  c(
    Athwart men's noses as they lies asleep;")
 mercutio_file = "death_of_mercutio.png"
 mercutio_file2 = "mercutio_actor.png"
-if (!file.exists(mercutio_file)){
-  mercutio_file_bad = tempfile(fileext = ".png")
-  download.file("https://upload.wikimedia.org/wikipedia/commons/b/bc/Death_of_Mercutio.png?download", 
-                destfile = mercutio_file_bad)
-  res = system2("ffmpeg", args = c("-y", "-i", mercutio_file_bad, mercutio_file))
-}
-if (!file.exists(mercutio_file2)){
-  mercutio_file_bad = tempfile(fileext = ".jpg")
-  download.file("https://upload.wikimedia.org/wikipedia/commons/7/76/Welles-Mercutio-1933.jpg?download", 
-                destfile = mercutio_file_bad)
-  res = system2("ffmpeg", args = c("-y", "-i", mercutio_file_bad, mercutio_file2))
-}
 
 output = "romeo.mp4"
 if (!file.exists(output)) {
