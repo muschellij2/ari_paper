@@ -169,6 +169,7 @@ if (!file.exists(output)) {
     service = "amazon",
     audio_codec = audio_codec)
 }
+TRUE
 ```
 <!-- https://youtu.be/ZCClmUv95iY -->
 The speech output can be seen at https://youtu.be/SFhvM9gI0kE .  We chose the voice "Joanna" to the the female US-English speaker for the script.  The voices are language-dependent; we can see the available voices for English for Amazon Polly below (from https://docs.aws.amazon.com/polly/latest/dg/SupportedLanguage.html):
@@ -198,7 +199,9 @@ if (!file.exists(output)) {
     service = "amazon",
     audio_codec = audio_codec)
 }
+TRUE
 ```
+
 <!-- https://youtu.be/VuaeRKvs-Y4 -->
 The speech output can be seen at https://youtu.be/fSS0JSb4VxM. The output video format is MP4 by default, but can be any format (aka "muxers") that the `ffmpeg` installation support, see the function `ffmpeg_muxers`.  Supported codecs can be founded using the functions `ffmpeg_audio_codecs` and `ffmpeg_video_codecs`.  The images and script can be presented in a number of ways, such as a text file and a series of PNG images.  More likely, the images and script will be bundled together, such as a Google Slide deck/PowerPoint presentation with the script in the notes section, or an HTML slide presentation based in R Markdown, where the script is in the HTML comments.  
 
