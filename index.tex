@@ -23,7 +23,7 @@ programmatically translating materials into other languages.
 Videos are a crucial way people learn and pervasive in online education
 platforms (TODO: Cite). Producing educational videos with a lecturer
 speaking over slides takes time, energy, and usually video editing
-skills. Maintaining the accuracy and relevancy of lecture videos focesed
+skills. Maintaining the accuracy and relevancy of lecture videos focused
 on technical subjects like computing programming or data science can
 often require remaking an entire video, requiring extensive editing and
 splicing of new segments. We present \CRANpkg{ari}, the
@@ -48,7 +48,7 @@ synthesizers take make use of deep learning methods, such as WaveNet
 (Van Den Oord et al. 2016) and have interfaces in R (Edmondson 2019;
 Muschelli 2019a; Leeper 2017). Currently in \pkg{ari}, synthesis of the
 the audio can be rendered using any of these services through the
-\CRANpkg{text2speech} (Muschelli 2019b). The default is
+\CRANpkg{text2speech} package (Muschelli 2019b). The default is
 \href{https://aws.amazon.com/polly/}{Amazon Polly}, which has text to
 speech voice generation in over 21 languages, including a total of 29
 dialects, implemented in the \CRANpkg{aws.polly} package (Leeper 2017).
@@ -71,7 +71,7 @@ used in \pkg{ari}, such as bitrate, audio and video codecs used, and
 output video format. The numerous additional video specifications can be
 applied to command-line arguments \texttt{ffmpeg} through \pkg{ari}.
 
-With these tools together, we can generate automated videos; we have
+With these tools together, we can generate automated content; we have
 used \pkg{ari} for educational videos. The spoken scripts for these
 videos can be stored in plain text, and therefore be version controlled,
 edited, and updated easily. If the figures are created in a reproducible
@@ -88,13 +88,13 @@ presentation.
 
 The main workhorse of \pkg{ari} is the \texttt{ari\_stitch} function.
 This function requires the audio to overlay on some images to have
-already been generated. The \texttt{ari\_stitch} function takes the
-audio and images, and ``stitches'' them together using \texttt{ffmpeg}.
-In order to use \pkg{ari}, one must have an \texttt{ffmpeg} installation
-to combine the audio and images. In the example below, 2 images
-(packaged with \pkg{ari}) are overlaid withe white noise for
-demonstration. This example also allows users to check if the output of
-\texttt{ffmpeg} works with a desired video player.
+already been generated. The \texttt{ari\_stitch} function takes audio
+and images, and ``stitches'' them together using \texttt{ffmpeg}. In
+order to use \pkg{ari}, one must have an \texttt{ffmpeg} installation to
+combine the audio and images. In the example below, 2 images (packaged
+with \pkg{ari}) are overlaid with white noise for demonstration. This
+example also allows users to check if the output of \texttt{ffmpeg}
+works with a desired video player.
 
 \begin{Schunk}
 \begin{Sinput}
@@ -105,15 +105,16 @@ result = ari_stitch(
   list(noise(), noise()),
   output = "noise.mp4")
 isTRUE(result)
+attributes(result)$outfile
 \end{Sinput}
+\end{Schunk}
+
+\begin{Schunk}
 \begin{Soutput}
 [1] TRUE
 \end{Soutput}
-\begin{Sinput}
-attributes(result)$outfile
-\end{Sinput}
 \begin{Soutput}
-[1] "/Users/johnmuschelli/Dropbox/Papers/ari_paper/noise.mp4"
+[1] "noise.mp4"
 \end{Soutput}
 \end{Schunk}
 
@@ -125,13 +126,13 @@ file. The video for this output can be seen at
 \subsection{Synthesizer
 authentication}\label{synthesizer-authentication}}
 
-In most cases, however, we do not have audio to overlay on images, but
-must generate it. Though one can generate the spoken audio in many ways,
-such as fitting a custom deep learning model, we will use the
-aforementioned services (e.g.~Google) as they have direct APIs for use.
-The downside of using such services is that users must go through steps
-to provide authentication, whereas most of these APIs and the associated
-R packages do not allow for interactive authentication such as OAuth.
+In most cases, however, we do must generate the audio to overlay on
+images. Though one can generate the spoken audio in many ways, such as
+fitting a custom deep learning model, we will use the aforementioned
+services (e.g.~Google) as they have direct APIs for use. The downside of
+using such services is that users must go through steps to provide
+authentication, whereas most of these APIs and the associated R packages
+do not allow for interactive authentication such as OAuth.
 
 The \pkg{text2speech} package provides a unified interface to these 3
 services, and we will focus on Amazon Polly and its authentication
@@ -261,6 +262,10 @@ Google Slide deck/PowerPoint presentation with the script in the notes
 section, or an HTML slide presentation based in R Markdown, where the
 script is in the HTML comments.
 
+\hypertarget{creating-videos-from-r-markdown-documents}{%
+\subsubsection{Creating Videos from R Markdown
+Documents}\label{creating-videos-from-r-markdown-documents}}
+
 For most R users, we believe the most natural setting is that the user
 has a slide deck using R Markdown, for example using the
 \CRANpkg{rmarkdown} or \CRANpkg{xaringan} packages (Allaire et al. 2019;
@@ -284,11 +289,12 @@ tail(x[ x != ""], 4)
 \end{Soutput}
 \end{Schunk}
 
-so that the script for this slide starts with \texttt{"Thank\ you"}.
-This setup allows for one plain text, version-controllable, integrated
-document that can reproducibly generate a video. We believe these
-features allow creators to make agile vidoes, that can easily be updated
-with new material or changed when errors or typos are found.
+so that the script for this slide to be spoken starts with
+\texttt{"Thank\ you"}. This setup allows for one plain text,
+version-controllable, integrated document that can reproducibly generate
+a video. We believe these features allow creators to make agile videos,
+that can easily be updated with new material or changed when errors or
+typos are found.
 
 Users can pass in both the R Markdown document and the resulting output,
 or simply the document, and the output will be created using
@@ -315,7 +321,9 @@ for the control on how \texttt{webshot} is run. Using the value
 \texttt{vectorized}, \pkg{webshot} is run on the entire slide deck and
 is faster, but may have some issues. The value \texttt{iterative} runs
 \texttt{webshot} for each slide separately, which can be more robust,
-but can be slower.
+but can be slower. These issues are negligible when there are only a few
+slides such as in these examples, but are relevant when the number of
+slides increases.
 
 With respect to accessibility, as \pkg{ari} has the synthesized script,
 this provides for direct subtitles for those hard of hearing rather than
@@ -329,6 +337,10 @@ correct pronunciation. For example, if you want the service to say
 ``RStudio'' or ``ggplot2'', the script should say ``R Studio'' and ``g g
 plot 2''. Thus, you may want to make edits to the subtitle file before
 uploading.
+
+\hypertarget{creating-videos-from-other-documents}{%
+\subsubsection{Creating Videos from Other
+Documents}\label{creating-videos-from-other-documents}}
 
 In order to create a video from a Google Slide deck or PowerPoint
 presentation, the slides should be converted to a set of images, likely
@@ -344,8 +356,8 @@ converted to PNGs using the \CRANpkg{pdftools} package (Ooms 2019). The
 \pkg{didactr} package also has a \texttt{pptx\_notes} function for
 reading PowerPoint notes and wraps most of the functionality for
 conversion. Converting from PowerPoint to PDF can be done using
-LibreOffice, which \CRANpkg{docxtractr} (Rudis and Muir, n.d.) has
-wrapper functions to achieve this.
+LibreOffice, which \CRANpkg{docxtractr}, versions \texttt{0.6.2} and
+above (Rudis and Muir 2019) has wrapper functions to achieve this.
 
 To demonstrate this, we use an example PowerPoint is located on Figshare
 (\url{https://figshare.com/articles/Example_PowerPoint_for_ari/8865230}).
@@ -407,6 +419,19 @@ this extraction process requires authentication, we will omit it here.
 Thus, we should be able to create videos using R Markdown, Google
 Slides, or PowerPoint presentations in an automatic fashion.
 
+\hypertarget{summary}{%
+\subsection{Summary}\label{summary}}
+
+The \pkg{ari} package combines multiple open-source tools and APIs to
+create reproducible workflows for creating videos. These videos can be
+created using R Markdown documents, PowerPoint presentations, Google
+Slide decks, or simply series of images. The audio overlaid on the
+images can be separate or contained within the storage of the images.
+These workflows can then be reproduced in the future and easily updated.
+As the current voice synthesis options are somewhat limited in the
+tenacity and inflection given, we believe that educational and
+informational videos are the most applicable area.
+
 \hypertarget{future-directions}{%
 \subsection{Future directions}\label{future-directions}}
 
@@ -421,9 +446,7 @@ for Windows provide installations.
 
 Although we rely on Amazon Polly for voice synthesis, other packages
 provide voice synthesis, such as \CRANpkg{mscstts} for Microsoft and
-\CRANpkg{googleLanguageR} for Google. We aim to harmonize these
-synthesis options, so that users can choose to create videos with the
-services that they support or have access to.
+\CRANpkg{googleLanguageR} for Google.
 
 Scripts can be automatically translated into other languages with
 services like the \href{https://cloud.google.com/translate/docs/}{Google
@@ -437,19 +460,6 @@ We have created a Docker environment
 create videos using \pkg{ari}. This Docker image increases the level of
 reproducibility and can be used to create standalone disk images to
 create content.
-
-\hypertarget{conclusions}{%
-\subsection{Conclusions}\label{conclusions}}
-
-The \pkg{ari} package combines multiple open-source tools and APIs to
-create reproducible workflows for creating videos. These videos can be
-created using R Markdown documents, PowerPoint presentations, Google
-Slide decks, or simply series of images. The audio overlaid on the
-images can be separate or contained within the storage of the images.
-These workflows can then be reproduced in the future and easily updated.
-As the current voice synthesis options are somewhat limited in the
-tenacity and inflection given, we believe that educational and
-informational videos are the most applicable area.
 
 \bibliography{RJreferences}
 
@@ -508,7 +518,7 @@ Converting of PDF Documents}.
 \url{https://CRAN.R-project.org/package=pdftools}.
 
 \leavevmode\hypertarget{ref-docxtractr}{}%
-Rudis, Bob, and Chris Muir. n.d. \emph{docxtractr: Extract Data Tables
+Rudis, Bob, and Chris Muir. 2019. \emph{docxtractr: Extract Data Tables
 and Comments from Microsoft Word Documents}.
 \url{http://gitlab.com/hrbrmstr/docxtractr}.
 
