@@ -79,7 +79,7 @@ With these tools together, we can generate automated videos; we have used \pkg{a
 <!-- `ffmpeg_opts` argument of `ari_stitch`. -->
 
 
-## Making videos with `ari`
+## Making videos with `ari`: `ari_stitch`
 
 The main workhorse of \pkg{ari} is the `ari_stitch` function.  This function requires the audio to overlay on some images to have already been generated. The `ari_stitch` function takes the audio and images, and "stitches" them together using `ffmpeg`.  In order to use \pkg{ari}, one must have an `ffmpeg` installation to combine the audio and images.  In the example below, 2 images (packaged with \pkg{ari}) are overlaid withe white noise for demonstration.  This example also allows users to check if the output of `ffmpeg` works with a desired video player.
 
@@ -104,7 +104,7 @@ Though one can generate the spoken audio in many ways, such as fitting a custom 
 The \pkg{text2speech} package provides a unified interface to these 3 services, and we will focus on Amazon Polly and its authentication requirements.  Polly is authenticated using the  \CRANpkg{aws.signature} package [@aws.signature].  The \pkg{aws.signature} documentation provides options and steps to create the relevant credentials; we have also provided an additional [tutorial](http://seankross.com/2017/05/02/Access-Amazon-Web-Services-in-R.html).  Essentially, the user must sign up for the service and retrieve public and private API keys and put them into their R profile or other areas accesssible to R.  Running `text2speech::tts_auth(service = "amazon")` will indicate if authentication was successful (if using a different service, change the  `service` argument).  NB: The APIs are generally paid services, but many have free tiers or limits, such as Amazon Polly's free tier for the first year (https://aws.amazon.com/polly/pricing/). 
 
 
-## Making videos with `ari`
+## Creating Speech from Text: `ari_spin`
 
 After Polly has been authenticated, videos can be using the `ari_spin` function with a set of images and of text.  This text is the "script" that is spoken over the images to create the output video.  The number of elements in the text need to be equal to the number of images.  Let us take a part of Mercutio's speech from Shakespeare's Romeo and Juliet [@shakespeare2003romeo] and overlay it on 2 images from the Wikipedia page about Mercutio (https://en.wikipedia.org/wiki/Mercutio):
 

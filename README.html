@@ -61383,10 +61383,66 @@ $(document).ready(function () {
 <!-- badges: start -->
 <!-- badges: end -->
 <p>The goal of ari_paper is to showcase the <a href="https://cran.r-project.org/package=ari"><code>ari</code> package</a>. We show how to use each function and the output videos. This README uses the <a href="https://github.com/muschellij2/video"><code>video</code></a> package to render videos inside the markdown. The paper can be viewed at <a href="https://johnmuschelli.com/ari_paper/" class="uri">https://johnmuschelli.com/ari_paper/</a>.</p>
-<pre class="r"><code>library(video)</code></pre>
-<pre class="r"><code>video::video(&quot;noise.mp4&quot;)</code></pre>
-<div id="file40a65a96ccc1" style="width:672px;height:480px;" class="video html-widget"></div>
-<script type="application/json" data-for="file40a65a96ccc1">{"x":{"id":"file40a65a96ccc1","video":"noise.mp4","mime_type":"video/mp4","controls":"controls","autoplay":false,"preload":"auto"},"evals":[],"jsHooks":[]}</script>
+<div id="making-videos-with-ari-ari_stitch" class="section level2">
+<h2>Making videos with <code>ari</code>: <code>ari_stitch</code></h2>
+<pre class="r"><code>library(tuneR)
+library(ari)
+result = ari_stitch(
+  ari_example(c(&quot;mab1.png&quot;, &quot;mab2.png&quot;)),
+  list(noise(), noise()),
+  output = &quot;noise.mp4&quot;)
+isTRUE(result)
+attributes(result)$outfile</code></pre>
+<div id="file41e92827bb98" style="width:672px;height:480px;" class="video html-widget"></div>
+<script type="application/json" data-for="file41e92827bb98">{"x":{"id":"file41e92827bb98","video":"noise.mp4","mime_type":"video/mp4","controls":"controls","autoplay":false,"preload":"auto"},"evals":[],"jsHooks":[]}</script>
+</div>
+<div id="creating-speech-from-text-ari_spin" class="section level2">
+<h2>Creating Speech from Text: <code>ari_spin</code></h2>
+<pre class="r"><code>res = ffmpeg_audio_codecs()
+fdk_enabled = grepl(&quot;fdk&quot;, res[ res$codec == &quot;aac&quot;, &quot;codec_name&quot;])
+if (fdk_enabled) {
+  audio_codec = &quot;libfdk_aac&quot;
+} else {
+  audio_codec = &quot;aac&quot;
+}
+speech =  c(
+  &quot;I will now perform part of Mercutio&#39;s speech from Shakespeare&#39;s Romeo and Juliet.&quot;, 
+  &quot;O, then, I see Queen Mab hath been with you.
+   She is the fairies&#39; midwife, and she comes
+   In shape no bigger than an agate-stone
+   On the fore-finger of an alderman,
+   Drawn with a team of little atomies
+   Athwart men&#39;s noses as they lies asleep;&quot;)
+mercutio_file = &quot;death_of_mercutio.png&quot;
+mercutio_file2 = &quot;mercutio_actor.png&quot;
+if (!file.exists(mercutio_file)){
+  mercutio_file_bad = tempfile(fileext = &quot;.png&quot;)
+  download.file(&quot;https://upload.wikimedia.org/wikipedia/commons/b/bc/Death_of_Mercutio.png?download&quot;, 
+                destfile = mercutio_file_bad)
+  res = system2(&quot;ffmpeg&quot;, args = c(&quot;-y&quot;, &quot;-i&quot;, mercutio_file_bad, mercutio_file))
+}
+if (!file.exists(mercutio_file2)){
+  mercutio_file_bad = tempfile(fileext = &quot;.jpg&quot;)
+  download.file(&quot;https://upload.wikimedia.org/wikipedia/commons/7/76/Welles-Mercutio-1933.jpg?download&quot;, 
+                destfile = mercutio_file_bad)
+  res = system2(&quot;ffmpeg&quot;, args = c(&quot;-y&quot;, &quot;-i&quot;, mercutio_file_bad, mercutio_file2))
+}
+
+output = &quot;romeo.mp4&quot;
+if (!file.exists(output)) {
+  run_voice = &quot;Joanna&quot;
+  ari_spin(
+    c(mercutio_file, mercutio_file2),
+    speech, output = output, voice = run_voice,
+    service = &quot;amazon&quot;,
+    audio_codec = audio_codec)
+}</code></pre>
+<div id="file41e94324d648" style="width:672px;height:480px;" class="video html-widget"></div>
+<script type="application/json" data-for="file41e94324d648">{"x":{"id":"file41e94324d648","video":"romeo.mp4","mime_type":"video/mp4","controls":"controls","autoplay":false,"preload":"auto"},"evals":[],"jsHooks":[]}</script>
+<p>We can also generate the video using the voice <code>Brian</code>, which is an British English male voice:</p>
+<div id="file41e947a45f9d" style="width:672px;height:480px;" class="video html-widget"></div>
+<script type="application/json" data-for="file41e947a45f9d">{"x":{"id":"file41e947a45f9d","video":"romeo_gb.mp4","mime_type":"video/mp4","controls":"controls","autoplay":false,"preload":"auto"},"evals":[],"jsHooks":[]}</script>
+</div>
 </div>
 
 
