@@ -30,10 +30,26 @@ bibliography: "RJreferences.bib"
 
 ## Introduction
 
-Videos are a crucial way people learn and they are pervasive in online education platforms (TODO: Cite).  Producing educational videos with a lecturer speaking over slides takes time, energy, and usually video editing skills. Maintaining the accuracy and relevancy of lecture videos focused on technical subjects like computing programming or data science can often require remaking an entire video, requiring extensive editing and splicing of new segments.  We present \CRANpkg{ari}, the **A**utomated **R** **I**nstructor as a tool to address these issues by creating reproducible presentations and videos that can be automatically generated from plain text files or similar artifacts.  By using \pkg{ari}, we provide a tool for users to rapidly create and update video content.
+Videos are a crucial way people learn and they are pervasive in online education platforms. Producing educational videos with a lecturer speaking over slides takes time, energy, and usually video editing skills. Maintaining the accuracy and relevancy of lecture videos focused on technical subjects like computing programming or data science can often require remaking an entire video, requiring extensive editing and splicing of new segments.  We present \CRANpkg{ari}, the **A**utomated **R** **I**nstructor as a tool to address these issues by creating reproducible presentations and videos that can be automatically generated from plain text files or similar artifacts.  By using \pkg{ari}, we provide a tool for users to rapidly create and update video content.
+
+```{r echo = FALSE, message=FALSE, eval=FALSE}
+# This chunk skips executing any other chunks
+knitr::opts_chunk$set(echo = TRUE, comment = "", eval = FALSE)
+languages <- 3
+dialects <- 3
+str_break = function(x, width = 80L) {
+  n = nchar(x)
+  if (n <= width) return(x)
+  n1 = seq(1L, n, by = width)
+  n2 = seq(width, n, by = width)
+  if (n %% width != 0) n2 = c(n2, n)
+  x = substring(x, n1, n2)
+  x = trimws(x)
+}
+```
 
 ```{r echo = FALSE, message=FALSE}
-#knitr::opts_chunk$set(echo = TRUE, comment = "")
+knitr::opts_chunk$set(echo = TRUE, comment = "")
 library(rvest)
 library(dplyr)
 library(text2speech)
@@ -70,7 +86,7 @@ if (fdk_enabled) {
 }
 ```
 
-In its simplest form a lecture video is comprised of visual content (e.g. slides and figures) and a spoken explanation of the visual content. Instead of a human lecturer the \pkg{ari} package uses a text-to-speech system to synthesize spoken audio for a lecture. Modern text-to-speech systems which take advantage of recent advancements in artificial intelligence research are available from [Google](https://cloud.google.com/text-to-speech/), [Microsoft](https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/), and [Amazon](https://aws.amazon.com/polly/).  Many of these synthesizers make use of deep learning methods, such as WaveNet [@van2016wavenet] (TODO: cite tacotron?) and have interfaces in R [@googleLanguageR; @mscstts; @aws.polly].  Currently in \pkg{ari}, synthesis of the the audio can be rendered using any of these services through the \CRANpkg{text2speech} [@text2speech] package.  The default is [Amazon Polly](https://aws.amazon.com/polly/), which has text to speech voice generation in over `r length(languages)` languages, including a total of `r length(dialects)` dialects, implemented in the \CRANpkg{aws.polly} package [@aws.polly].  In addition to multiple languages, the speech generation services provide voices with several pitches representing different genders within the same language.  We present the \pkg{ari} package with reproducible use case examples and the video outputs with different voices in multiple languages.
+In its simplest form a lecture video is comprised of visual content (e.g. slides and figures) and a spoken explanation of the visual content. Instead of a human lecturer the \pkg{ari} package uses a text-to-speech system to synthesize spoken audio for a lecture. Modern text-to-speech systems which take advantage of recent advancements in artificial intelligence research are available from [Google](https://cloud.google.com/text-to-speech/), [Microsoft](https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/), and [Amazon](https://aws.amazon.com/polly/).  Many of these synthesizers make use of deep learning methods, such as WaveNet [@van2016wavenet] and have interfaces in R [@googleLanguageR; @mscstts; @aws.polly].  Currently in \pkg{ari}, synthesis of the the audio can be rendered using any of these services through the \CRANpkg{text2speech} [@text2speech] package.  The default is [Amazon Polly](https://aws.amazon.com/polly/), which has text to speech voice generation in over `r length(languages)` languages, including a total of `r length(dialects)` dialects, implemented in the \CRANpkg{aws.polly} package [@aws.polly].  In addition to multiple languages, the speech generation services provide voices with several pitches representing different genders within the same language.  We present the \pkg{ari} package with reproducible use case examples and the video outputs with different voices in multiple languages.
 
 The \pkg{ari} package relies on the \CRANpkg{tuneR} package for splitting and
 combining audio files appropriately so that lecture narration is synced with
@@ -228,7 +244,7 @@ if (!file.exists(output)) {
 
 The output video is located at https://youtu.be/rv9fg_qsqc0. In our experience with several users we have found that some HTML slides take more or less time to render when using \pkg{webshot}; for example they may be tinted with gray because they are in the middle of a slide transition when the image of the slide is captured.  Therefore we provide the `delay` argument in `ari_narrate` which is passed to \pkg{webshot}. This can resolve these issues by allowing more time for the page to fully render, however this means it may take for more time to create each video.  We also provide the argument `capture_method`  to allow for finely-tuned control of `webshot`. When `capture_method = "vectorized"`, \pkg{webshot} is run on the entire slide deck in a faster process, however we have experienced slide rendering issues with this setting depending on the configuration of an individual's computer. However when `capture_method = "iterative"`, each slide is rendered individually in `webshot`, which solves many rendering issues, however it causes videos to be rendered more slowly.
 
-With respect to accessibility, \pkg{ari} encourages video creators to type out a script by design. This provides an effortless source of subtitles for those who are (TODO: find a better phrase) hard of hearing rather than relying on other services, such as YouTube, to provide speech-to-text subtitles.  When using `ari_spin`, if the `subtitles` argument is `TRUE`, then an SRT file for subtitles will be created with the video.
+With respect to accessibility, \pkg{ari} encourages video creators to type out a script by design. This provides an effortless source of subtitles for people with hearing loss rather than relying on other services, such as YouTube, to provide speech-to-text subtitles.  When using `ari_spin`, if the `subtitles` argument is `TRUE`, then an SRT file for subtitles will be created with the video.
 
 One issue with synthesis of technical information is that changes to the script are required for Amazon Polly or other services to provide a correct pronunciation.  For example, if you want the service to say "RStudio" or "ggplot2", the phrases "R Studio" or "g g plot 2" must be written exactly that way in the script. These phrases will then appear in an SRT subtitle file, which may be confusing to a viewer.
 
@@ -287,11 +303,11 @@ For Google Slides, the slide deck can be downloaded as a PowerPoint and the prev
 
 ## Future directions
 
-\pkg{ari} and \pkg{didactr} are already being used to build data science curriculla (TODO cite CBDS and SK&PG VLHCC) and we look forward to collaborating with video creators to augment \pkg{ari} according to their changing needs. In the following section we outline possible directions for the future of the project.
+\pkg{ari} and \pkg{didactr} are already being used to build data science curriculla [@Kross-2019] and we look forward to collaborating with video creators to augment \pkg{ari} according to their changing needs. In the following section we outline possible directions for the future of the project.
 
 Since \pkg{ari} is designed for teaching technical content, we plan to provide better support for the pronunciation of technical terms like the names of popular software tools. These names are usually not pronunced correctly by text-to-speech services because they are not words contained in the training data used in the deep learning models used by these services. To address this concern we plan to compile a dictionary of commonly used technical terms and the phonetic phrasing and spelling of these terms that are required in order to achieve the correct pronounciation from text-to-speech services.
 
-In addition to still images and synthesized voices, we would like to develop new technologies for incorperating other automatically generated videos into lectures generated by \pkg{ari}. As computer programming, statistics, and data science instructors we often rely on live coding (TODO CITE some of pg & co's work probably) to demonstrate software tools to our students. Live coding videos suffer from many of the same problems as other kinds of technical videos as we addressed in the introduction. Therefore we plan to build a system for automating the creation of live coding videos. These videos would also be created using plain text documents like R Markdown. They would integrate synthesized narration with code chunks that would be displayed and executed according to specilized commands that would specify when code should be executed in an IDE like RStudio. These commands could also control which panes and tabs of the IDE are visible or emphasized.
+In addition to still images and synthesized voices, we would like to develop new technologies for incorperating other automatically generated videos into lectures generated by \pkg{ari}. As computer programming, statistics, and data science instructors we often rely on live coding [@ChenLAS2019] to demonstrate software tools to our students. Live coding videos suffer from many of the same problems as other kinds of technical videos as we addressed in the introduction. Therefore we plan to build a system for automating the creation of live coding videos. These videos would also be created using plain text documents like R Markdown. They would integrate synthesized narration with code chunks that would be displayed and executed according to specilized commands that would specify when code should be executed in an IDE like RStudio. These commands could also control which panes and tabs of the IDE are visible or emphasized.
 
 As programmatic video creation software improves, we plan to extend \pkg{ari} so it can expand its compatibility with different technologies. For example we believe the heavy reliance on an `ffmpeg` installation can be mitigated in the future with advances in the \pkg{av} package.  Though the \pkg{av} package has powerful functionality and is currently porting more from `libav` and therefore `ffmpeg`, it currently does not have the capabilities required for \pkg{ari}.  Although third party installation from https://ffmpeg.org/ can be burdensome to a user, package managers such as `brew` for OSX and `choco` for Windows provide an easier installation and configuration experience. 
 
