@@ -125,7 +125,8 @@ attributes(result)$outfile
 \end{Schunk}
 
 The output is a logical indicator of success and the path of the output
-file. The video for this output can be seen at
+file.\\
+The video for this output can be seen at
 \url{https://youtu.be/3kgaYf-EV90}.
 
 \hypertarget{synthesizer-authentication}{%
@@ -202,8 +203,8 @@ isTRUE(shakespeare_result)
 \end{Soutput}
 \end{Schunk}
 
-The speech output can be seen at \url{https://youtu.be/SFhvM9gI0kE} . We
-chose the voice ``Joanna'' which is designated as a female sounding
+The speech output can be seen at \url{https://youtu.be/SFhvM9gI0kE}.\\
+We chose the voice ``Joanna'' which is designated as a female sounding
 US-English speaker for the script. Each voice is language-dependent; we
 can see the available voices for English for Amazon Polly at
 \url{https://docs.aws.amazon.com/polly/latest/dg/SupportedLanguage.html}.
@@ -345,7 +346,7 @@ using LibreOffice and the \CRANpkg{docxtractr}(Rudis and Muir 2019)
 package which contains the necessary wrapper functions.
 
 To demonstrate this, we use an example PowerPoint is located on Figshare
-(\url{https://figshare.com/articles/Example_PowerPoint_for_ari/8865230}).
+(\url{https://figshare.com/articles/Example_PowerPoint_for_ari/8865230}).\\
 We can convert the PowerPoint to PDF, then to a set of PNG images, then
 extract the speaker notes.
 
@@ -411,8 +412,9 @@ The \pkg{ari} package combines multiple open-source tools and APIs to
 create reproducible workflows for creating videos. These videos can be
 created using R Markdown documents, PowerPoint presentations, Google
 Slide decks, or simply series of images. The audio overlaid on the
-images can be separate or contained within the storage of the images.
-These workflows can then be reproduced in the future and easily updated.
+images can be separate or contained within the storage of the images.\\
+These workflows can then be reproduced in the future and easily
+updated.\\
 As the current voice synthesis options are somewhat limited in the
 tenacity and inflection given, we believe that educational and
 informational videos are the most applicable area.
@@ -455,13 +457,14 @@ As programmatic video creation software improves, we plan to extend
 \pkg{ari} so it can expand its compatibility with different
 technologies. For example we believe the heavy reliance on an
 \texttt{ffmpeg} installation can be mitigated in the future with
-advances in the \pkg{av} package. Though the \pkg{av} package has
-powerful functionality and is currently porting more from \texttt{libav}
-and therefore \texttt{ffmpeg}, it currently does not have the
-capabilities required for \pkg{ari}. Although third party installation
-from \url{https://ffmpeg.org/} can be burdensome to a user, package
-managers such as \texttt{brew} for OSX and \texttt{choco} for Windows
-provide an easier installation and configuration experience.
+advances in the \pkg{av} package.\\
+Though the \pkg{av} package has powerful functionality and is currently
+porting more from \texttt{libav} and therefore \texttt{ffmpeg}, it
+currently does not have the capabilities required for \pkg{ari}.
+Although third party installation from \url{https://ffmpeg.org/} can be
+burdensome to a user, package managers such as \texttt{brew} for OSX and
+\texttt{choco} for Windows provide an easier installation and
+configuration experience.
 
 Although we rely on Amazon Polly for voice synthesis, other packages
 provide voice synthesis, such as \CRANpkg{mscstts} for Microsoft and
