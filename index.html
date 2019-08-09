@@ -7,6 +7,7 @@
 <meta charset="utf-8" />
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -352,18 +353,6 @@ summary {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 
 
@@ -388,17 +377,17 @@ $(document).ready(function () {
 <address class="author_afil">
 Cognitive Science, University of California, San Diego<br><a class="author_email" href="mailto:#"><a href="mailto:seankross@ucsd.edu" class="email">seankross@ucsd.edu</a></a>
 </address>
-<h4 class="author">John Muschelli</h4>
-<address class="author_afil">
-Department of Biostatistics, Johns Hopkins Bloomberg School of Public Health<br><a class="author_email" href="mailto:#"><a href="mailto:jmusche1@jhu.edu" class="email">jmusche1@jhu.edu</a></a>
-</address>
 <h4 class="author">Jeffrey T. Leek</h4>
 <address class="author_afil">
 Department of Biostatistics, Johns Hopkins Bloomberg School of Public Health<br><a class="author_email" href="mailto:#"><a href="mailto:jtleek@jhu.edu" class="email">jtleek@jhu.edu</a></a>
 </address>
+<h4 class="author">John Muschelli</h4>
+<address class="author_afil">
+Department of Biostatistics, Johns Hopkins Bloomberg School of Public Health<br><a class="author_email" href="mailto:#"><a href="mailto:jmusche1@jhu.edu" class="email">jmusche1@jhu.edu</a></a>
+</address>
 <div class="abstract">
 <p class="abstract">Abstract</p>
-We present the <code>ari</code> package for automatically generating technology-focused educational videos. The goal of the package is to be able to create reproducible videos, with the ability to change and update video content seamlessly. We present several examples of generating videos including using R Markdown slide decks, PowerPoint slides, or simple images as source material. We also discuss how <code>ari</code> can help instructors reach new audiences through programmatically translating materials into other languages.
+We present the <code>ari</code> package for automatically generating technology-focused educational videos. The goal of the package is to create reproducible videos, with the ability to change and update video content seamlessly. We present several examples of generating videos including using R Markdown slide decks, PowerPoint slides, or simple images as source material. We also discuss how <code>ari</code> can help instructors reach new audiences through programmatically translating materials into other languages.
 </div>
 
 </div>
@@ -406,27 +395,27 @@ We present the <code>ari</code> package for automatically generating technology-
 
 <div id="introduction" class="section level2">
 <h2>Introduction</h2>
-<p>Videos are a crucial way people learn and they are pervasive in online education platforms (TODO: Cite). Producing educational videos with a lecturer speaking over slides takes time, energy, and usually video editing skills. Maintaining the accuracy and relevancy of lecture videos focused on technical subjects like computing programming or data science can often require remaking an entire video, requiring extensive editing and splicing of new segments. We present , the <strong>A</strong>utomated <strong>R</strong> <strong>I</strong>nstructor as a tool to address these issues by creating reproducible presentations and videos that can be automatically generated from plain text files or similar artifacts. By using , we provide a tool for users to rapidly create and update video content.</p>
-<p>In its simplest form a lecture video is comprised of visual content (e.g. slides and figures) and a spoken explanation of the visual content. Instead of a human lecturer the  package uses a text-to-speech system to synthesize spoken audio for a lecture. Modern text-to-speech systems which take advantage of recent advancements in artificial intelligence research are available from <a href="https://cloud.google.com/text-to-speech/">Google</a>, <a href="https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/">Microsoft</a>, and <a href="https://aws.amazon.com/polly/">Amazon</a>. Many of these synthesizers make use of deep learning methods, such as WaveNet <span class="citation">(Van Den Oord et al. 2016)</span> and have interfaces in R <span class="citation">(Edmondson 2019; Muschelli 2019a; Leeper 2017)</span>. Currently in , synthesis of the the audio can be rendered using any of these services through the  <span class="citation">(Muschelli 2019b)</span> package. The default is <a href="https://aws.amazon.com/polly/">Amazon Polly</a>, which has text to speech voice generation in over 21 languages, including a total of 29 dialects, implemented in the  package <span class="citation">(Leeper 2017)</span>. In addition to multiple languages, the speech generation services provide voices with several pitches representing different genders within the same language. We present the  package with reproducible use case examples and the video outputs with different voices in multiple languages.</p>
-<p>The  package relies on the  package for splitting and combining audio files appropriately so that lecture narration is synced with each slide <span class="citation">(Ligges et al. 2018)</span>. Once the audio is generated, it is synced with images to make a lecture video. Multiple open source tools for video editing and splicing exist.  takes advantage of the <code>ffmpeg</code> (<a href="http://www.ffmpeg.org/" class="uri">http://www.ffmpeg.org/</a>) software, a command-line interface to the <code>libav</code> library. These powerful tools have been thoroughly tested with a development history spanning almost 20 years.  uses <code>ffmpeg</code> to piece together images and audio into a lecture video.  has been built with presets for <code>ffmpeg</code> which allow output videos to be compatible with multiple platforms, including the YouTube and Coursera players. These presets include specifying the bitrate, audio and video codecs, and the output video format. The numerous additional video specifications for customization can be applied to command-line arguments <code>ffmpeg</code> through .</p>
-<p>We have developed a workflow with  as the centerpiece for automatically generating educational videos. The narration script for lecture videos is stored in a plain text format, so that it can be synthesized into audio files via text-to-speech services. By storing lecture narration in plain text it can be updated, tracked, and collaboratively or automatically updated with version control software like Git and GitHub. If the figures in the lecture slides are created in a reproducible framework, such as generated using R code, the entire video can be reproducibly created and automatically updated. Thus,  is the Automated R Instructor. We will provide examples of creating videos based on the following sets of source files: a slide deck built with R Markdown, a set of images and a script, or a Google Slide deck or PowerPoint presentation.</p>
+<p>Videos are a crucial way people learn and they are pervasive in online education platforms <span class="citation">(Hsin and Cigas 2013; Hartsell and Yuen 2006)</span>. Producing educational videos with a lecturer speaking over slides takes time, energy, and usually video editing skills. Maintaining the accuracy and relevancy of lecture videos focused on technical subjects like computing programming or data science can often require remaking an entire video, requiring extensive editing and splicing of new segments. We present , the <strong>A</strong>utomated <strong>R</strong> <strong>I</strong>nstructor as a tool to address these issues by creating reproducible presentations and videos that can be automatically generated from plain text files or similar artifacts. By using , we provide a tool for users to rapidly create and update video content.</p>
+<p>In its simplest form a lecture video is comprised of visual content (e.g. slides and figures) and a spoken explanation of the visual content. Instead of a human lecturer, the  package uses a text-to-speech system to synthesize spoken audio for a lecture. Modern text-to-speech systems that take advantage of recent advancements in artificial intelligence research are available from <a href="https://cloud.google.com/text-to-speech/">Google</a>, <a href="https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/">Microsoft</a>, and <a href="https://aws.amazon.com/polly/">Amazon</a>. Many of these synthesizers make use of deep learning methods, such as WaveNet <span class="citation">(Van Den Oord et al. 2016)</span> and have interfaces in R <span class="citation">(Edmondson 2019; Muschelli 2019a; Leeper 2017)</span>. Currently in , synthesis of the the audio can be rendered using any of these services through the  package <span class="citation">(Muschelli 2019b)</span>. The default is <a href="https://aws.amazon.com/polly/">Amazon Polly</a>, which has text-to-speech voice generation in over 21 languages, including a total of 29 dialects, implemented in the  package <span class="citation">(Leeper 2017)</span>. In addition to multiple languages, the speech generation services provide voices with several pitches representing different genders within the same language. We present the  package with reproducible use case examples and the video outputs with different voices in multiple languages.</p>
+<p>The  package relies on the  package for splitting and combining audio files appropriately so that lecture narration is synced with each slide <span class="citation">(Ligges et al. 2018)</span>. Once the audio is generated, it is synced with images to make a lecture video. Multiple open source tools for video editing and splicing exist;  takes advantage of the <code>ffmpeg</code> (<a href="http://www.ffmpeg.org/" class="uri">http://www.ffmpeg.org/</a>) software, a command-line interface to the <code>libav</code> library. These powerful tools have been thoroughly tested with a development history spanning almost 20 years.  has been built with presets for <code>ffmpeg</code> which allow output videos to be compatible with multiple platforms, including the YouTube and Coursera players. These presets include specifying the bitrate, audio and video codecs, and the output video format. The numerous additional video specifications for customization can be applied to command-line arguments <code>ffmpeg</code> through .</p>
+<p>We have developed a workflow with  as the centerpiece for automatically generating educational videos. The narration script for lecture videos is stored in a plain text format, so that it can be synthesized into audio files via text-to-speech services. By storing lecture narration in plain text it can be updated, tracked, and collaboratively or automatically updated with version control software like Git and GitHub. If the figures in the lecture slides are created in a reproducible framework, such as generated using R code, the entire video can be reproducibly created and automatically updated. Thus,  is the Automated R Instructor. We will provide examples of creating videos based on the following sets of source files: a slide deck built with R Markdown, a set of images and a script, or a Google Slide deck or PowerPoint presentation. We will also demonstrate the , which contains helper functions extensions of .</p>
 <!-- `ffmpeg_opts` argument of `ari_stitch`. -->
 </div>
 <div id="making-videos-with-ari-ari_stitch" class="section level2">
 <h2>Making videos with <code>ari</code>: <code>ari_stitch</code></h2>
-<p>The main workhorse of  is the <code>ari_stitch</code> function. This function requires an ordered set of images and an ordered set of  audio objects that correspond to each image. The <code>ari_stitch</code> function sequentially “stitches” each image which is shown in the video for the duration of its corresponding audio object using <code>ffmpeg</code>. In order to use , one must have an <code>ffmpeg</code> installation to combine the audio and images. In the example below, 2 images (packaged with ) are overlaid withe white noise for demonstration. This example also allows users to check if the output of <code>ffmpeg</code> works with a desired video player.</p>
+<p>The main workhorse of  is the <code>ari_stitch</code> function. This function requires an ordered set of images and an ordered set of audio objects, either paths to <code>wav</code> files or  Wave objects, that correspond to each image. The <code>ari_stitch</code> function sequentially “stitches” each image in the video for the duration of its corresponding audio object using <code>ffmpeg</code>. In order to use , one must have an <code>ffmpeg</code> installation to combine the audio and images. Other packages such as  have a similar requirement. Moreover, on <a href="https://www.shinyapps.io/">shinyapps.io</a>, a dependency on the  package will trigger an installation of <code>ffmpeg</code> so  can be used on <a href="https://www.shinyapps.io/">shinyapps.io</a>. In the example below, 2 images (packaged with ) are overlaid withe white noise for demonstration. This example also allows users to check if the output of <code>ffmpeg</code> works with a desired video player.</p>
 <pre class="r"><code>library(tuneR)
 library(ari)
 result = ari_stitch(
   ari_example(c(&quot;mab1.png&quot;, &quot;mab2.png&quot;)),
   list(noise(), noise()),
   output = &quot;noise.mp4&quot;)
-isTRUE(result)
-attributes(result)$outfile</code></pre>
+isTRUE(result)</code></pre>
 <pre><code>[1] TRUE</code></pre>
+<p>The output is a logical indicator, but additional attributes are available, such as the path of the output file:</p>
+<pre class="r"><code>attributes(result)$outfile</code></pre>
 <pre><code>[1] &quot;noise.mp4&quot;</code></pre>
-<p>The output is a logical indicator of success and the path of the output file.<br />
-The video for this output can be seen at <a href="https://youtu.be/3kgaYf-EV90" class="uri">https://youtu.be/3kgaYf-EV90</a>.</p>
+<p>The video for this output can be seen at <a href="https://youtu.be/3kgaYf-EV90" class="uri">https://youtu.be/3kgaYf-EV90</a>.</p>
 </div>
 <div id="synthesizer-authentication" class="section level2">
 <h2>Synthesizer authentication</h2>
@@ -462,44 +451,60 @@ isTRUE(gb_result)</code></pre>
 <pre><code>[1] TRUE</code></pre>
 <!-- https://youtu.be/VuaeRKvs-Y4 -->
 <p>The resulting video can be seen at <a href="https://youtu.be/fSS0JSb4VxM" class="uri">https://youtu.be/fSS0JSb4VxM</a>.</p>
-<p>The output video format is MP4 by default, but several formats can be specified via specifying the appropriate “muxer” for <code>ffmpeg</code> (see the function <code>ffmpeg_muxers</code>). Supported codecs can be founded using the functions <code>ffmpeg_audio_codecs</code> and <code>ffmpeg_video_codecs</code>.</p>
+<p>The output video format is MP4 by default, but several formats can be specified via specifying the appropriate “muxer” for <code>ffmpeg</code> (see the function <code>ffmpeg_muxers</code>). Supported codecs can be founded using the functions <code>ffmpeg_audio_codecs</code> and <code>ffmpeg_video_codecs</code>. Additional options can be passed to <code>ffmpeg</code> from <code>ari_stitch</code> and <code>ari_spin</code> to customize the video to the necessary specifications.</p>
 <p>We now discuss the number of image and script inputs that  is designed to work with, including text files and a series of PNG images, a Google Slide deck or a PowerPoint presentation with the script written in the speaker notes section, or an HTML slide presentation created from an R Markdown, where the script is written in the HTML comments.</p>
 <div id="creating-videos-from-r-markdown-documents" class="section level3">
 <h3>Creating Videos from R Markdown Documents</h3>
-<p>Many R users have experience creating slide decks with R Markdown, for example using the  or  packages <span class="citation">(Allaire et al. 2019; Xie, Allaire, and Grolemund 2018; Xie 2018)</span>. In , the HTML slides are rendered using  <span class="citation">(Chang 2018)</span> and the script is located in HTML comments (i.e. between <code>&lt;!--</code> and <code>--&gt;</code>). For example, in the file <code>ari_comments.Rmd</code>, which is an <code>ioslides</code> type of R Markdown slide deck, we have the last slide:</p>
+<p>Many R users have experience creating slide decks with R Markdown, for example using the  or  packages <span class="citation">(Allaire et al. 2019; Xie, Allaire, and Grolemund 2018; Xie 2018)</span>. In , the HTML slides are rendered using  <span class="citation">(Chang 2018)</span> and the script is located in HTML comments (i.e. between <code>&lt;!--</code> and <code>--&gt;</code>). For example, in the file <code>ari_comments.Rmd</code> included in , which is an <code>ioslides</code> type of R Markdown slide deck, we have the last slide:</p>
 <pre class="r"><code>x = readLines(ari_example(&quot;ari_comments.Rmd&quot;))
 tail(x[ x != &quot;&quot;], 4)</code></pre>
 <pre><code>[1] &quot;## Conclusion&quot;                                             
 [2] &quot;&lt;!--&quot;                                                      
 [3] &quot;Thank you for watching this video and good luck using Ari!&quot;
 [4] &quot;--&gt;&quot;                                                       </code></pre>
-<p>so that the script for this slide starts with <code>&quot;Thank you&quot;</code>. This setup allows for one plain text, version-controllable, integrated document that can reproducibly generate a video. We believe these features allow creators to make agile videos, that can easily be updated with new material or changed when errors or typos are found.</p>
-<p>Users can pass in both the R Markdown document and the rendered slides from the document, or simply the document, and the output will be created using <code>render</code> from  <span class="citation">(Allaire et al. 2019)</span>. Here we create the video for <code>ari_comments.Rmd</code>:</p>
+<p>so that the first words spoken on that slide are <code>&quot;Thank you&quot;</code>. This setup allows for one plain text, version-controllable, integrated document that can reproducibly generate a video. We believe these features allow creators to make agile videos, that can easily be updated with new material or changed when errors or typos are found. Moreover, this framework provides an opportunity to translate videos into multiple languages, we will discuss in the future directions.</p>
+<p>Using <code>ari_narrate</code>, users can create videos from R Markdown documents that create slide decks. The can be passed in, and the output will be created using the <code>render</code> function from  <span class="citation">(Allaire et al. 2019)</span>. If the slides are already rendered, the user can pass these slides and the original document, where the script is extracted. Passing rendered slides allows with the option for a custom rendering script. Here we create the video for <code>ari_comments.Rmd</code>, where the slides are rendered inside <code>ari_narrate</code>:</p>
 <pre class="r"><code># Create a video from an R Markdown file with comments and slides
 res = ari_narrate(
   script = ari_example(&quot;ari_comments.Rmd&quot;),
   voice = &quot;Kendra&quot;,
   capture_method = &quot;iterative&quot;)</code></pre>
-<p>The output video is located at <a href="https://youtu.be/rv9fg_qsqc0" class="uri">https://youtu.be/rv9fg_qsqc0</a>. In our experience with several users we have found that some HTML slides take more or less time to render when using ; for example they may be tinted with gray because they are in the middle of a slide transition when the image of the slide is captured. Therefore we provide the <code>delay</code> argument in <code>ari_narrate</code> which is passed to . This can resolve these issues by allowing more time for the page to fully render, however this means it may take for more time to create each video. We also provide the argument <code>capture_method</code> to allow for finely-tuned control of <code>webshot</code>. When <code>capture_method = &quot;vectorized&quot;</code>,  is run on the entire slide deck in a faster process, however we have experienced slide rendering issues with this setting depending on the configuration of an individual’s computer. However when <code>capture_method = &quot;iterative&quot;</code>, each slide is rendered individually in <code>webshot</code>, which solves many rendering issues, however it causes videos to be rendered more slowly.</p>
+<p>The output video is located at <a href="https://youtu.be/rv9fg_qsqc0" class="uri">https://youtu.be/rv9fg_qsqc0</a>. In our experience with several users we have found that some HTML slides take more or less time to render when using ; for example they may be tinted with gray because they are in the middle of a slide transition when the image of the slide is captured. Therefore we provide the <code>delay</code> argument in <code>ari_narrate</code> which is passed to . This can resolve these issues by allowing more time for the page to fully render, however this means it may take for more time to create each video. We also provide the argument <code>capture_method</code> to allow for finely-tuned control of <code>webshot</code>. When <code>capture_method = &quot;vectorized&quot;</code>,  is run on the entire slide deck in a faster process, however we have experienced slide rendering issues with this setting depending on the configuration of an individual’s computer. However when <code>capture_method = &quot;iterative&quot;</code>, each slide is rendered individually in <code>webshot</code>, which solves many rendering issues, however it causes videos to be rendered more slowly.<br />
+In the future, other HTML headless rendering engines (<code>webshot</code> uses PhantomJS) may be used if they achieve better performance, but we have found  to work well in most of our applications.</p>
 <p>With respect to accessibility,  encourages video creators to type out a script by design. This provides an effortless source of subtitles for people with hearing loss rather than relying on other services, such as YouTube, to provide speech-to-text subtitles. When using <code>ari_spin</code>, if the <code>subtitles</code> argument is <code>TRUE</code>, then an SRT file for subtitles will be created with the video.</p>
-<p>One issue with synthesis of technical information is that changes to the script are required for Amazon Polly or other services to provide a correct pronunciation. For example, if you want the service to say “RStudio” or “ggplot2”, the phrases “R Studio” or “g g plot 2” must be written exactly that way in the script. These phrases will then appear in an SRT subtitle file, which may be confusing to a viewer.</p>
+<p>One issue with synthesis of technical information is that changes to the script are required for Amazon Polly or other services to provide a correct pronunciation. For example, if you want the service to say “RStudio” or “ggplot2”, the phrases “R Studio” or “g g plot 2” must be written exactly that way in the script. These phrases will then appear in an SRT subtitle file, which may be confusing to a viewer. Thus, some post-processing of the SRT file may be needed.</p>
 </div>
 <div id="creating-videos-from-other-documents" class="section level3">
 <h3>Creating Videos from Other Documents</h3>
-<p>In order to create a video from a Google Slide deck or PowerPoint presentation, the slides should be converted to a set of images. We recommend using the PNG format for these images. In order to get the script for the video, we suggest putting the script for each slide in the speaker notes section of that slide. Several of the following features for video generation are in our package  (<a href="https://github.com/muschellij2/didactr" class="uri">https://github.com/muschellij2/didactr</a>). The speaker notes of slides can be extracted using  <span class="citation">(Noorazman 2018)</span> for Google Slides via the API or using / <span class="citation">(Gohel 2019; Ewing 2017)</span> to read from PowerPoint documents. Google Slides can be downloaded as a PDF and converted to PNGs using the  package <span class="citation">(Ooms 2019)</span>. The  package also has a <code>pptx_notes</code> function for reading PowerPoint notes. Converting PowerPoint files to PDF can be done using LibreOffice and the <span class="citation">(Rudis and Muir 2019)</span> package which contains the necessary wrapper functions.</p>
-<p>To demonstrate this, we use an example PowerPoint is located on Figshare (<a href="https://figshare.com/articles/Example_PowerPoint_for_ari/8865230" class="uri">https://figshare.com/articles/Example_PowerPoint_for_ari/8865230</a>).<br />
-We can convert the PowerPoint to PDF, then to a set of PNG images, then extract the speaker notes.</p>
+<p>In order to create a video from a Google Slide deck or PowerPoint presentation, the slides should be converted to a set of images. We recommend using the PNG format for these images. In order to get the script for the video, we suggest putting the script for each slide in the speaker notes section of that slide. Several of the following features for video generation are in our package  (<a href="https://github.com/muschellij2/ariExtra" class="uri">https://github.com/muschellij2/ariExtra</a>). The speaker notes of slides can be extracted using  <span class="citation">(Noorazman 2018)</span> for Google Slides via the API or using / <span class="citation">(Gohel 2019; Ewing 2017)</span> to read from PowerPoint documents. Google Slides can be downloaded as a PDF and converted to PNGs using the  package <span class="citation">(Ooms 2019)</span>. The  package also has a <code>pptx_notes</code> function for reading PowerPoint notes. Converting PowerPoint files to PDF can be done using LibreOffice and the  package <span class="citation">(Rudis and Muir 2019)</span> which contains the necessary wrapper functions.</p>
+<p>To demonstrate this, we use an example PowerPoint is located on Figshare (<a href="https://figshare.com/articles/Example_PowerPoint_for_ari/8865230" class="uri">https://figshare.com/articles/Example_PowerPoint_for_ari/8865230</a>). We can convert the PowerPoint to PDF, then to a set of PNG images, then extract the speaker notes.</p>
 <pre class="r"><code>pptx = &quot;ari.pptx&quot;
-pdf = docxtractr::convert_to_pdf(pptx)
+download.file(paste0(&quot;https://s3-eu-west-1.amazonaws.com/&quot;, 
+                     &quot;pfigshare-u-files/16252631/ari.pptx&quot;),
+              destfile = pptx)
+pdf = docxtractr::convert_to_pdf(pptx) # &gt;= 0.6.2 
 pngs = pdftools::pdf_convert(pdf, dpi = 300)
-notes = didactr::pptx_notes(pptx)
+notes = ariExtra::pptx_notes(pptx)
 notes</code></pre>
 <pre><code>[1] &quot;Sometimes it’s hard for an instructor to take the time to record their lectures.
 For example, I’m in a coffee shop and it may be loud.&quot;
 
 [2] &quot;Here is an example of a plot with really small axes.  We plot the x versus the y
 -variables and a smoother between them.&quot;</code></pre>
-<p>We can then render the video with the “Kimberly” voice. We use the <code>divisible_height</code> argument to forcibly scale the height of the images to be divisible by 2 if necessary. This is required by the<code>x264</code> codec which we have specified as a preset:</p>
+<p>The  package also can combine these processes and take multiple input types (Google Slides, PDFs, PPTX) and harmonize the output. The <code>pptx_to_ari</code> function combines the above steps:</p>
+<pre class="r"><code>doc = ariExtra::pptx_to_ari(pptx)</code></pre>
+<pre><code>Converting page 1 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//RtmpufNFgK/file7e7b3318a7f7.png... done!
+Converting page 2 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//RtmpufNFgK/file7e7b17bb6356.png... done!</code></pre>
+<pre class="r"><code>doc[c(&quot;images&quot;, &quot;script&quot;)]</code></pre>
+<pre><code>$images
+[1] &quot;/private/var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T/RtmpufNFgK/file7e7bf76af46_files/slide_1.png&quot;
+[2] &quot;/private/var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T/RtmpufNFgK/file7e7bf76af46_files/slide_2.png&quot;
+
+$script
+[1] &quot;Sometimes it’s hard for an instructor to take the time to record their lectures.  For example, I’m in a coffee shop and it may be loud.&quot;
+[2] &quot;Here is an example of a plot with really small axes.  We plot the x versus the y-variables and a smoother between them.&quot;                </code></pre>
+<p>which can be passed to <code>ari_spin</code>.</p>
+<p>We can then render the video with the “Kimberly” voice. We use the <code>divisible_height</code> argument to forcibly scale the height of the images to be divisible by 2 if necessary. This is required by the <code>x264</code> (default) codec which we have specified as a preset:</p>
 <pre class="r"><code>pptx_result = ari_spin(pngs, notes, output = &quot;pptx.mp4&quot;, voice = &quot;Kimberly&quot;,
     divisible_height = TRUE, subtitles = TRUE)
 isTRUE(pptx_result)</code></pre>
@@ -510,29 +515,27 @@ isTRUE(pptx_result)</code></pre>
 [4] &quot;2&quot;                                       
 [5] &quot;00:00:02,025 --&gt; 00:00:04,005&quot;           
 [6] &quot;take the time to record their lectures.&quot; </code></pre>
-<p>For Google Slides, the slide deck can be downloaded as a PowerPoint and the previous steps can be used, however it can also be downloaded directly as a PDF. The  package has the function <code>gs_notes_from_slide</code> to extract the notes for synthesis. As this extraction process requires authentication, we will omit it here. Thus, we should be able to create videos using R Markdown, Google Slides, or PowerPoint presentations in an automatic fashion.</p>
+<p>For Google Slides, the slide deck can be downloaded as a PowerPoint and the previous steps can be used, however it can also be downloaded directly as a PDF. We will use the same presentation, but uploaded to Google Slides. The  package has the function <code>gs_to_ari</code> to wrap this functionality (as long as link sharing is turned on), where we can pass the Google identifier:</p>
+<pre class="r"><code>gs_doc = ariExtra::gs_to_ari(&quot;14gd2DiOCVKRNpFfLrryrGG7D3S8pu9aZ&quot;)</code></pre>
+<pre><code>Converting page 1 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//RtmpufNFgK/file7e7b4430d81b.png... done!
+Converting page 2 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//RtmpufNFgK/file7e7b62bbf796.png... done!</code></pre>
+<p>Note, as Google provides a PDF version of the slides, this obviates the LibreOffice dependency.</p>
+<p>Alternatively, the notes can be extracted using  and for Google Slides via the API, but requires authentication, so we will omit it here. Thus, we should be able to create videos using R Markdown, Google Slides, or PowerPoint presentations in an automatic fashion.</p>
 </div>
 </div>
 <div id="summary" class="section level2">
 <h2>Summary</h2>
-<p>The  package combines multiple open-source tools and APIs to create reproducible workflows for creating videos. These videos can be created using R Markdown documents, PowerPoint presentations, Google Slide decks, or simply series of images. The audio overlaid on the images can be separate or contained within the storage of the images.<br />
-These workflows can then be reproduced in the future and easily updated.<br />
-As the current voice synthesis options are somewhat limited in the tenacity and inflection given, we believe that educational and informational videos are the most applicable area.</p>
+<p>The  package combines multiple open-source tools and APIs to create reproducible workflows for creating videos. These videos can be created using R Markdown documents, PowerPoint presentations, Google Slide decks, or simply series of images. The audio overlaid on the images can be separate or contained within the storage of the images. These workflows can then be reproduced in the future and easily updated. As the current voice synthesis options are somewhat limited in the tenacity and inflection given, we believe that educational and informational videos are the most applicable area.</p>
 </div>
 <div id="future-directions" class="section level2">
 <h2>Future directions</h2>
-<p> and  are already being used to build data science curriculla <span class="citation">(Kross and Guo 2019)</span> and we look forward to collaborating with video creators to augment  according to their changing needs. In the following section we outline possible directions for the future of the project.</p>
-<p>Since  is designed for teaching technical content, we plan to provide better support for the pronunciation of technical terms like the names of popular software tools. These names are usually not pronunced correctly by text-to-speech services because they are not words contained in the training data used in the deep learning models used by these services. To address this concern we plan to compile a dictionary of commonly used technical terms and the phonetic phrasing and spelling of these terms that are required in order to achieve the correct pronounciation from text-to-speech services.</p>
-<p>In addition to still images and synthesized voices, we would like to develop new technologies for incorperating other automatically generated videos into lectures generated by . As computer programming, statistics, and data science instructors we often rely on live coding <span class="citation">(Chen and Guo 2019)</span> to demonstrate software tools to our students. Live coding videos suffer from many of the same problems as other kinds of technical videos as we addressed in the introduction. Therefore we plan to build a system for automating the creation of live coding videos. These videos would also be created using plain text documents like R Markdown. They would integrate synthesized narration with code chunks that would be displayed and executed according to specilized commands that would specify when code should be executed in an IDE like RStudio. These commands could also control which panes and tabs of the IDE are visible or emphasized.</p>
-<p>As programmatic video creation software improves, we plan to extend  so it can expand its compatibility with different technologies. For example we believe the heavy reliance on an <code>ffmpeg</code> installation can be mitigated in the future with advances in the  package.<br />
-Though the  package has powerful functionality and is currently porting more from <code>libav</code> and therefore <code>ffmpeg</code>, it currently does not have the capabilities required for . Although third party installation from <a href="https://ffmpeg.org/" class="uri">https://ffmpeg.org/</a> can be burdensome to a user, package managers such as <code>brew</code> for OSX and <code>choco</code> for Windows provide an easier installation and configuration experience.</p>
-<p>Although we rely on Amazon Polly for voice synthesis, other packages provide voice synthesis, such as  for Microsoft and  for Google. We created the  package to harmonize these synthesis options for .</p>
-<p>We see significant potential in how  could expand global learning opportunities. Video narration scripts can be automatically translated into other languages with services like the <a href="https://cloud.google.com/translate/docs/">Google Translation API</a>, where  provides an interface. Amazon Polly can speak languages other than English, meaning that one can write a lecture once and generate lecture videos in multiple languages. Therefore this workflow can greatly expand the potential audience for educational videos with relatively little additional effort from lecture creators. We plan to flesh out these workflows so that video creators can manage videos in multiple languages. We hope to add functionality so that communities of learners with language expertise can easily suggest modifications to automatically translated videos, and tooling so suggestions can be incorperated quickly.</p>
-<p>The workflow we have specified requires many interlocking pieces of software, therefore we have created a Docker environment (<a href="https://github.com/seankross/bologna" class="uri">https://github.com/seankross/bologna</a>) which contains the required packages to create videos using . This Docker image ensures that our workflow is completely reproducable, and it also enables deployment to multiple disk images for creating lecture videos at scale.</p>
-</div>
-<div id="conclusions" class="section level2">
-<h2>Conclusions</h2>
-<p>The  package combines multiple open-source tools and APIs to create reproducible workflows for creating educational lecture videos. These videos can be created using R Markdown documents, PowerPoint presentations, Google Slide decks, or simply a series of images. The source of the audio overlaid on the images can be stored in a separate file or it can be contained within any of the specified file formats. Our workflow ensures thats these videos can then be reproduced in the future and easily updated. Given the content that it is practical to create with this workflow, and the limtted nature of voice synthesis tools, we believe that  is most appropriate for the production of educational and informational videos.</p>
+<p>The  package is already being used to build data science curricula <span class="citation">(Kross and Guo 2019)</span> and we look forward to collaborating with video creators to augment  according to their changing needs. In the following section we outline possible directions for the future of the project.</p>
+<p>Since  is designed for teaching technical content, we plan to provide better support for the pronunciation of technical terms like the names of popular software tools. These names are usually not pronounced correctly by text-to-speech services because they are not words contained in the training data used in the deep learning models used by these services. To address this concern we plan to compile a dictionary of commonly used technical terms and the phonetic phrasing and spelling of these terms that are required in order to achieve the correct pronunciation from text-to-speech services.</p>
+<p>In addition to still images and synthesized voices, we would like to develop new technologies for incorporating other automatically generated videos into lectures generated by . As computer programming, statistics, and data science instructors we often rely on live coding <span class="citation">(Chen and Guo 2019)</span> to demonstrate software tools to our students. Live coding videos suffer from many of the same problems as other kinds of technical videos as we addressed in the introduction. Therefore we plan to build a system for automating the creation of live coding videos. These videos would also be created using plain text documents like R Markdown. They would integrate synthesized narration with code chunks that would be displayed and executed according to specialized commands that would specify when code should be executed in an IDE like RStudio. These commands could also control which panes and tabs of the IDE are visible or emphasized.</p>
+<p>As programmatic video creation software improves, we plan to extend  so it can expand its compatibility with different technologies. For example we believe the heavy reliance on an <code>ffmpeg</code> installation can be mitigated in the future with advances in the  package. Though the  package has powerful functionality and is currently porting more from <code>libav</code> and therefore <code>ffmpeg</code>, it currently does not have the capabilities required for . Although third party installation from <a href="https://ffmpeg.org/" class="uri">https://ffmpeg.org/</a> can be burdensome to a user, package managers such as <code>brew</code> for OSX and <code>choco</code> for Windows provide an easier installation and configuration experience.</p>
+<p>Although we rely on Amazon Polly for voice synthesis, other packages provide voice synthesis, such as  for Microsoft and  for Google. We created the  package to harmonize these synthesis options for . Thus, switching from one voice generation service to another simply involves switching the <code>service</code> and <code>voice</code> arguments in , assuming the service is properly authenticated. This ease of switching allows researchers to compare and test which voices and services are most effective at delivering content.</p>
+<p>We see significant potential in how  could expand global learning opportunities. Video narration scripts can be automatically translated into other languages with services like the <a href="https://cloud.google.com/translate/docs/">Google Translation API</a>, where  provides an interface. Amazon Polly can speak languages other than English, meaning that one can write a lecture once and generate lecture videos in multiple languages. Therefore this workflow can greatly expand the potential audience for educational videos with relatively little additional effort from lecture creators. We plan to flesh out these workflows so that video creators can manage videos in multiple languages. We hope to add functionality so that communities of learners with language expertise can easily suggest modifications to automatically translated videos, and tooling so suggestions can be incorporated quickly.</p>
+<p>The workflow we have specified requires many interlocking pieces of software, therefore we have created a Docker environment (<a href="https://github.com/seankross/bologna" class="uri">https://github.com/seankross/bologna</a>) which contains the required packages to create videos using . This Docker image ensures that our workflow is completely reproducible, and it also enables deployment to multiple disk images for creating lecture videos at scale.</p>
 
 <!-- Note to Self/John: Come to think of it Ari is missing a feature, which is the ability to insert a video into a lecture! -->
 <div id="refs" class="references">
@@ -553,6 +556,12 @@ Though the  package has powerful functionality and is currently porting more fro
 </div>
 <div id="ref-officer">
 <p>Gohel, David. 2019. <em>officer: Manipulation of Microsoft Word and PowerPoint Documents</em>. <a href="https://CRAN.R-project.org/package=officer">https://CRAN.R-project.org/package=officer</a>.</p>
+</div>
+<div id="ref-hartsell2006video">
+<p>Hartsell, Taralynn, and Steve Chi-Yin Yuen. 2006. “Video Streaming in Online Learning.” <em>AACE Journal</em> 14 (1): 31–43.</p>
+</div>
+<div id="ref-hsin2013short">
+<p>Hsin, Wen-Jung, and John Cigas. 2013. “Short Videos Improve Student Learning in Online Education.” <em>Journal of Computing Sciences in Colleges</em> 28 (5): 253–59.</p>
 </div>
 <div id="ref-Kross-2019">
 <p>Kross, Sean, and Philip J. Guo. 2019. “End-User Programmers Repurposing End-User Programming Tools to Foster Diversity in Adult End-User Programming Education.” In <em>Proceedings of VL/HCC 2019: IEEE Symposium on Visual Languages and Human-Centric Computing</em>. VL/HCC ’19. Memphis, TN, USA.</p>
@@ -613,6 +622,23 @@ $(document).ready(function () {
 
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>

@@ -7,20 +7,20 @@ author:
     - 9500 Gilman Dr. 
     - La Jolla, CA 92093
     email:  seankross@ucsd.edu
+  - name: Jeffrey T. Leek
+    affiliation: Department of Biostatistics, Johns Hopkins Bloomberg School of Public Health
+    address:
+    - 615 N Wolfe Street
+    - Baltimore, MD 21231
+    email:  jtleek@jhu.edu    
   - name: John Muschelli
     affiliation: Department of Biostatistics, Johns Hopkins Bloomberg School of Public Health
     address:
     - 615 N Wolfe Street
     - Baltimore, MD 21231
     email:  jmusche1@jhu.edu
-  - name: Jeffrey T. Leek
-    affiliation: Department of Biostatistics, Johns Hopkins Bloomberg School of Public Health
-    address:
-    - 615 N Wolfe Street
-    - Baltimore, MD 21231
-    email:  jtleek@jhu.edu
 abstract: >
-  We present the `ari` package for automatically generating technology-focused educational videos. The goal of the package is to be able to create reproducible videos, with the ability to change and update video content seamlessly. We present several examples of generating videos including using R Markdown slide decks, PowerPoint slides, or simple images as source material. We also discuss how `ari` can help instructors reach new audiences through programmatically translating materials into other languages.
+  We present the `ari` package for automatically generating technology-focused educational videos. The goal of the package is to create reproducible videos, with the ability to change and update video content seamlessly. We present several examples of generating videos including using R Markdown slide decks, PowerPoint slides, or simple images as source material. We also discuss how `ari` can help instructors reach new audiences through programmatically translating materials into other languages.
 output:
   rticles::rjournal_article:
     includes:
@@ -30,12 +30,12 @@ bibliography: "RJreferences.bib"
 
 ## Introduction
 
-Videos are a crucial way people learn and they are pervasive in online education platforms (TODO: Cite). Producing educational videos with a lecturer speaking over slides takes time, energy, and usually video editing skills. Maintaining the accuracy
+Videos are a crucial way people learn and they are pervasive in online education platforms [@hsin2013short; @hartsell2006video]. Producing educational videos with a lecturer speaking over slides takes time, energy, and usually video editing skills. Maintaining the accuracy
 and relevancy of lecture videos focused on technical subjects like computing
 programming or data science can often require remaking an entire video, requiring extensive editing and splicing of new segments.  We present \CRANpkg{ari}, the
 **A**utomated **R** **I**nstructor as a tool to address these issues by creating reproducible presentations and videos that can be automatically generated from plain text files or similar artifacts.  By using \pkg{ari}, we provide a tool for users to rapidly create and update video content.
 
-```{r echo = FALSE, message=FALSE, eval=FALSE}
+```{r, echo = FALSE, message=FALSE, eval=FALSE}
 # This chunk skips executing any other chunks
 knitr::opts_chunk$set(echo = TRUE, comment = "", eval = FALSE)
 languages <- 3
@@ -89,10 +89,10 @@ if (fdk_enabled) {
 }
 ```
 
-In its simplest form a lecture video is comprised of visual content (e.g. slides and figures) and a spoken explanation of the visual content. Instead of a human lecturer the \pkg{ari} package uses a text-to-speech system to synthesize spoken audio for a lecture. Modern text-to-speech systems which take advantage of recent
+In its simplest form a lecture video is comprised of visual content (e.g. slides and figures) and a spoken explanation of the visual content. Instead of a human lecturer, the \pkg{ari} package uses a text-to-speech system to synthesize spoken audio for a lecture. Modern text-to-speech systems that take advantage of recent
 advancements in artificial intelligence research are available from [Google](https://cloud.google.com/text-to-speech/), [Microsoft](https://azure.microsoft.com/en-us/services/cognitive-services/text-to-speech/), and [Amazon](https://aws.amazon.com/polly/).  Many of these synthesizers
-make use of deep learning methods, such as WaveNet [@van2016wavenet] and have interfaces in R [@googleLanguageR; @mscstts; @aws.polly].  Currently in \pkg{ari}, synthesis of the the audio can be rendered using any of these services through the \CRANpkg{text2speech} [@text2speech] package.  The default is
-[Amazon Polly](https://aws.amazon.com/polly/), which has text to speech voice generation in over `r length(languages)` languages, including a total of `r length(dialects)` dialects, implemented in the \CRANpkg{aws.polly} package
+make use of deep learning methods, such as WaveNet [@van2016wavenet] and have interfaces in R [@googleLanguageR; @mscstts; @aws.polly].  Currently in \pkg{ari}, synthesis of the the audio can be rendered using any of these services through the \CRANpkg{text2speech} package [@text2speech].  The default is
+[Amazon Polly](https://aws.amazon.com/polly/), which has text-to-speech voice generation in over `r length(languages)` languages, including a total of `r length(dialects)` dialects, implemented in the \CRANpkg{aws.polly} package
 [@aws.polly].  In addition to multiple languages, the speech generation services provide voices with several pitches representing different genders within the same
 language.  We present the \pkg{ari} package with reproducible use case examples and the video outputs with different voices in multiple languages.
 
@@ -100,8 +100,8 @@ The \pkg{ari} package relies on the \CRANpkg{tuneR} package for splitting and
 combining audio files appropriately so that lecture narration is synced with
 each slide [@tuneR].
 Once the audio is generated, it is synced with images to make a lecture 
-video.  Multiple open source tools for video editing and splicing exist. \pkg{ari} takes advantage of  the `ffmpeg` (http://www.ffmpeg.org/) software, a command-line interface to the `libav` library. These powerful tools have been thoroughly tested
-with a development history spanning almost 20 years. \pkg{ari} uses `ffmpeg` to piece together images and audio into a lecture video. \pkg{ari} has been built with presets for `ffmpeg` which allow output videos to be compatible with multiple
+video.  Multiple open source tools for video editing and splicing exist; \pkg{ari} takes advantage of  the `ffmpeg` (http://www.ffmpeg.org/) software, a command-line interface to the `libav` library. These powerful tools have been thoroughly tested
+with a development history spanning almost 20 years.  \pkg{ari} has been built with presets for `ffmpeg` which allow output videos to be compatible with multiple
 platforms, including the YouTube and Coursera players.  These presets include specifying the bitrate, audio and video codecs, and the output video format. The numerous additional video specifications for customization can be applied to
 command-line arguments `ffmpeg` through \pkg{ari}.
 
@@ -112,7 +112,7 @@ updated, tracked, and collaboratively or automatically updated with version cont
 a reproducible framework, such as generated using R code, the entire video can be reproducibly created and automatically updated.  Thus, \pkg{ari} is the 
 Automated R Instructor.  We will provide examples of creating videos based 
 on the following sets of source files: a slide deck built with R Markdown, 
-a set of images and a script, or a Google Slide deck or PowerPoint presentation.
+a set of images and a script, or a Google Slide deck or PowerPoint presentation.  We will also demonstrate the \CRANpkg{ariExtra}, which contains helper functions extensions of \pkg{ari}.
 
 <!-- `ffmpeg_opts` argument of `ari_stitch`. -->
 
@@ -120,10 +120,10 @@ a set of images and a script, or a Google Slide deck or PowerPoint presentation.
 ## Making videos with `ari`: `ari_stitch`
 
 The main workhorse of \pkg{ari} is the `ari_stitch` function.  This function 
-requires an ordered set of images and an ordered set of \pkg{tuneR} audio 
-objects that correspond to each image. The `ari_stitch` function sequentially 
-"stitches" each image which is shown in the video for the duration of its corresponding audio object using `ffmpeg`.  In order to use \pkg{ari}, one must
-have an `ffmpeg` installation to combine the audio and images.  In the example below, 2 images (packaged with \pkg{ari}) are overlaid withe white noise for
+requires an ordered set of images and an ordered set of audio 
+objects, either paths to `wav` files or \pkg{tuneR} Wave objects, that correspond to each image. The `ari_stitch` function sequentially 
+"stitches" each image in the video for the duration of its corresponding audio object using `ffmpeg`.  In order to use \pkg{ari}, one must
+have an `ffmpeg` installation to combine the audio and images. Other packages such as \CRANpkg{animation} have a similar requirement.  Moreover, on [shinyapps.io]( https://www.shinyapps.io/), a dependency on the \pkg{animation} package will trigger an installation of `ffmpeg` so \pkg{ari} can be used on [shinyapps.io]( https://www.shinyapps.io/).  In the example below, 2 images (packaged with \pkg{ari}) are overlaid withe white noise for
 demonstration.  This example also allows users to check if the output of `ffmpeg` works with a desired video player.
 
 ```{r stitch, message = FALSE, eval = FALSE}
@@ -134,7 +134,6 @@ result = ari_stitch(
   list(noise(), noise()),
   output = "noise.mp4")
 isTRUE(result)
-attributes(result)$outfile
 ```
 
 ```{r stitch_run, message = FALSE, echo = FALSE, eval = TRUE}
@@ -145,10 +144,18 @@ result = ari_stitch(
   list(noise(), noise()),
   output = "noise.mp4")
 isTRUE(result)
+```
+
+The output is a logical indicator, but additional attributes are available, such as the path of the output file:
+
+```{r stitch_out, message = FALSE, eval = FALSE}
+attributes(result)$outfile
+```
+
+```{r stitch_out_run, message = FALSE, echo = FALSE, eval = TRUE}
 basename(attributes(result)$outfile)
 ```
 
-The output is a logical indicator of success and the path of the output file.  
 The video for this output can be seen at https://youtu.be/3kgaYf-EV90.  
 
 ## Synthesizer authentication
@@ -275,7 +282,7 @@ The resulting video can be seen at https://youtu.be/fSS0JSb4VxM.
 The output video format is MP4 by default, but several formats can be 
 specified via specifying the appropriate "muxer" for `ffmpeg` (see the 
 function `ffmpeg_muxers`). Supported codecs can be founded using the 
-functions `ffmpeg_audio_codecs` and `ffmpeg_video_codecs`. 
+functions `ffmpeg_audio_codecs` and `ffmpeg_video_codecs`.  Additional options can be passed to `ffmpeg` from `ari_stitch` and `ari_spin` to customize the video to the necessary specifications.
 
 
 We now discuss the number of image and script inputs that \pkg{ari} is 
@@ -291,7 +298,7 @@ example using the \CRANpkg{rmarkdown} or \CRANpkg{xaringan} packages
 [@rmarkdown; @rmarkdownbook; @xaringan].  In \pkg{ari}, the HTML slides 
 are rendered using \CRANpkg{webshot} [@webshot] and the script is located 
 in HTML comments (i.e. between `<!--` and `-->`).  For example, in the 
-file `ari_comments.Rmd`, which is an `ioslides` type of R Markdown slide 
+file `ari_comments.Rmd` included in \pkg{ari}, which is an `ioslides` type of R Markdown slide 
 deck, we have the last slide:
 
 ```{r}
@@ -299,16 +306,16 @@ x = readLines(ari_example("ari_comments.Rmd"))
 tail(x[ x != ""], 4)
 ```
 
-so that the script for this slide starts with `"Thank you"`. This setup 
+so that the first words spoken on that slide are `"Thank you"`. This setup 
 allows for one plain text, version-controllable, integrated document that 
 can reproducibly generate a video.  We believe these features allow creators 
 to make agile videos, that can easily be updated with new material or changed 
-when errors or typos are found.
+when errors or typos are found.  Moreover, this framework provides an opportunity to translate videos into multiple languages, we will discuss in the future directions.  
 
-Users can pass in both the R Markdown document and the rendered slides 
-from the document, or simply the document, and the output will be created 
-using `render` from \pkg{rmarkdown} [@rmarkdown]. Here we create the video 
-for `ari_comments.Rmd`:
+Using `ari_narrate`, users can create videos from R Markdown documents that create slide decks.  The can be passed in, and 
+the output will be created using the `render` function from \pkg{rmarkdown} [@rmarkdown].
+If the slides are already rendered, the user can pass these slides and the original document, where the script is extracted.  Passing rendered slides allows with the option for a custom rendering script.  Here we create the video 
+for `ari_comments.Rmd`, where the slides are rendered inside `ari_narrate`:
 
 ```{r narr_show, eval = FALSE}
 # Create a video from an R Markdown file with comments and slides
@@ -347,7 +354,8 @@ experienced slide rendering issues with this setting depending on the
 configuration of an individual's computer. However when 
 `capture_method = "iterative"`, each slide is rendered individually 
 in `webshot`, which solves many rendering issues, however it causes 
-videos to be rendered more slowly.
+videos to be rendered more slowly.  
+In the future, other HTML headless rendering engines (`webshot` uses PhantomJS) may be used if they achieve better performance, but we have found \pkg{webshot} to work well in most of our applications.
 
 With respect to accessibility, \pkg{ari} encourages video creators to 
 type out a script by design. This provides an effortless source of subtitles 
@@ -361,7 +369,7 @@ are required for Amazon Polly or other services to provide a correct
 pronunciation.  For example, if you want the service to say "RStudio" or 
 "ggplot2", the phrases "R Studio" or "g g plot 2" must be written exactly 
 that way in the script. These phrases will then appear in an SRT subtitle 
-file, which may be confusing to a viewer.
+file, which may be confusing to a viewer.  Thus, some post-processing of the SRT file may be needed. 
 
 ### Creating Videos from Other Documents
 
@@ -370,31 +378,32 @@ presentation, the slides should be converted to a set of images. We
 recommend using the PNG format for these images.  In order to get the 
 script for the video, we suggest putting the script for each slide in 
 the speaker notes section of that slide. Several of the following features 
-for video generation are in our package \pkg{didactr}
-(https://github.com/muschellij2/didactr).  The speaker notes of slides can 
+for video generation are in our package \pkg{ariExtra}
+(https://github.com/muschellij2/ariExtra).  The speaker notes of slides can 
 be extracted using \CRANpkg{rgoogleslides} [@rgoogleslides] for Google 
 Slides via the API or using \CRANpkg{readOffice}/\CRANpkg{officer} 
 [@officer; @readOffice] to read from PowerPoint documents. Google Slides can be downloaded as a PDF and converted to PNGs using the \CRANpkg{pdftools} 
-package  [@pdftools].  The \pkg{didactr} package also has a `pptx_notes` 
+package  [@pdftools].  The \pkg{ariExtra} package also has a `pptx_notes` 
 function for reading PowerPoint notes. Converting PowerPoint files to 
-PDF can be done using LibreOffice and the \CRANpkg{docxtractr}[@docxtractr] 
-package which contains the necessary wrapper functions.
+PDF can be done using LibreOffice and the \CRANpkg{docxtractr} package [@docxtractr] which contains the necessary wrapper functions.
 
-To demonstrate this, we use an example PowerPoint is located on Figshare (https://figshare.com/articles/Example_PowerPoint_for_ari/8865230).  
-We can convert the PowerPoint to PDF, then to a set of PNG images, then extract the speaker notes.
+To demonstrate this, we use an example PowerPoint is located on Figshare (https://figshare.com/articles/Example_PowerPoint_for_ari/8865230).  We can convert the PowerPoint to PDF, then to a set of PNG images, then extract the speaker notes.
 
 ```{r pptx_convert, eval = FALSE, message=FALSE}
 pptx = "ari.pptx"
-pdf = docxtractr::convert_to_pdf(pptx)
+download.file(paste0("https://s3-eu-west-1.amazonaws.com/", 
+                     "pfigshare-u-files/16252631/ari.pptx"),
+              destfile = pptx)
+pdf = docxtractr::convert_to_pdf(pptx) # >= 0.6.2 
 pngs = pdftools::pdf_convert(pdf, dpi = 300)
-notes = didactr::pptx_notes(pptx)
+notes = ariExtra::pptx_notes(pptx)
 notes
 ```
 
 ```{r pptx_convert_run, eval = TRUE, echo = FALSE}
 pptx = "ari.pptx"
 pngs = c("ari_1.png", "ari_2.png")
-notes = didactr::pptx_notes(pptx)
+notes = ariExtra::pptx_notes(pptx) 
 show_notes = notes
 names(show_notes) = NULL
 show_notes = sapply(show_notes, str_break)
@@ -404,9 +413,17 @@ show_notes = paste0('[', 1:length(show_notes), '] ', '"', show_notes, '"')
 cat(show_notes, sep = '\n\n')
 ```
 
+The \pkg{ariExtra} package also can combine these processes and take multiple input types (Google Slides, PDFs, PPTX) and harmonize the output.  The `pptx_to_ari` function combines the above steps:
+
+```{r, message=FALSE}
+doc = ariExtra::pptx_to_ari(pptx)
+doc[c("images", "script")]
+```
+which can be passed to `ari_spin`. 
+
 We can then render the video with the "Kimberly" voice.  We use the
 `divisible_height` argument to forcibly scale the height of the images 
-to be divisible by 2 if necessary. This is required by the`x264` codec which 
+to be divisible by 2 if necessary. This is required by the `x264` (default) codec which 
 we have specified as a preset:
 
 ```{r, echo = TRUE, eval = FALSE}
@@ -436,8 +453,16 @@ head(setdiff(readLines("pptx.srt"), ""))
 
 For Google Slides, the slide deck can be downloaded as a PowerPoint and the
 previous steps can be used, however it can also be downloaded directly as 
-a PDF. The \pkg{didactr} package has the function `gs_notes_from_slide` to 
-extract the notes for synthesis.  As this extraction process requires authentication, we will omit it here.  Thus, we should be able to create 
+a PDF. We will use the same presentation, but uploaded to Google Slides. The \pkg{ariExtra} package has the function `gs_to_ari` to wrap this functionality (as long as link sharing is turned on), where we can pass the Google identifier:
+
+```{r, message=FALSE}
+gs_doc = ariExtra::gs_to_ari("14gd2DiOCVKRNpFfLrryrGG7D3S8pu9aZ")
+```
+
+Note, as Google provides a PDF version of the slides, this obviates the LibreOffice dependency.
+
+Alternatively, the notes can be extracted using
+\pkg{rgoogleslides} and for Google Slides via the API, but requires authentication, so we will omit it here.  Thus, we should be able to create 
 videos using R Markdown, Google Slides, or PowerPoint presentations in an 
 automatic fashion.
 
@@ -447,31 +472,29 @@ The \pkg{ari} package combines multiple open-source tools and APIs to
 create reproducible workflows for creating videos.  These videos can 
 be created using R Markdown documents, PowerPoint presentations, Google 
 Slide decks, or simply series of images.  The audio overlaid on the 
-images can be separate or contained within the storage of the images.  
-These workflows can then be reproduced in the future and easily updated.  
-As the current voice synthesis options are somewhat limited in the tenacity 
+images can be separate or contained within the storage of the images.  These workflows can then be reproduced in the future and easily updated. As the current voice synthesis options are somewhat limited in the tenacity 
 and inflection given, we believe that educational and informational videos 
 are the most applicable area.  
 
 ## Future directions
 
-\pkg{ari} and \pkg{didactr} are already being used to build data science 
-curriculla [@Kross-2019] and we look forward to collaborating with video 
+The \pkg{ari} package is already being used to build data science 
+curricula [@Kross-2019] and we look forward to collaborating with video 
 creators to augment \pkg{ari} according to their changing needs. In the 
 following section we outline possible directions for the future of the project.
 
 Since \pkg{ari} is designed for teaching technical content, we plan to 
 provide better support for the pronunciation of technical terms like the 
-names of popular software tools. These names are usually not pronunced 
+names of popular software tools. These names are usually not pronounced 
 correctly by text-to-speech services because they are not words contained 
 in the training data used in the deep learning models used by these services. 
 To address this concern we plan to compile a dictionary of commonly used 
 technical terms and the phonetic phrasing and spelling of these terms that 
-are required in order to achieve the correct pronounciation from 
+are required in order to achieve the correct pronunciation from 
 text-to-speech services.
 
 In addition to still images and synthesized voices, we would like to 
-develop new technologies for incorperating other automatically generated 
+develop new technologies for incorporating other automatically generated 
 videos into lectures generated by \pkg{ari}. As computer programming, 
 statistics, and data science instructors we often rely on live coding [@ChenLAS2019] to demonstrate software tools to our students. Live 
 coding videos suffer from many of the same problems as other kinds of 
@@ -479,19 +502,18 @@ technical videos as we addressed in the introduction. Therefore we plan
 to build a system for automating the creation of live coding videos. 
 These videos would also be created using plain text documents like R 
 Markdown. They would integrate synthesized narration with code chunks 
-that would be displayed and executed according to specilized commands 
+that would be displayed and executed according to specialized commands 
 that would specify when code should be executed in an IDE like RStudio. 
 These commands could also control which panes and tabs of the IDE are visible or emphasized.
 
 As programmatic video creation software improves, we plan to extend 
 \pkg{ari} so it can expand its compatibility with different technologies. 
-For example we believe the heavy reliance on an `ffmpeg` installation can be mitigated in the future with advances in the \pkg{av} package.  
-Though the \pkg{av} package has powerful functionality and is currently porting more from `libav` and therefore `ffmpeg`, it currently does not have the capabilities required for \pkg{ari}.  Although third party
+For example we believe the heavy reliance on an `ffmpeg` installation can be mitigated in the future with advances in the \pkg{av} package.  Though the \pkg{av} package has powerful functionality and is currently porting more from `libav` and therefore `ffmpeg`, it currently does not have the capabilities required for \pkg{ari}.  Although third party
 installation from https://ffmpeg.org/ can be burdensome to a user, package managers such as `brew` for OSX and `choco` for Windows provide an easier installation and configuration experience. 
 
 Although we rely on Amazon Polly for voice synthesis, other packages 
 provide voice synthesis, such as \CRANpkg{mscstts} for Microsoft and
-\CRANpkg{googleLanguageR} for Google.  We created the \pkg{text2speech} package to harmonize these synthesis options for \pkg{ari}.
+\CRANpkg{googleLanguageR} for Google.  We created the \pkg{text2speech} package to harmonize these synthesis options for \pkg{ari}.  Thus, switching from one voice generation service to another simply involves switching the `service` and `voice` arguments in \pkg{ari}, assuming the service is properly authenticated.  This ease of switching allows researchers to compare and test which voices and services are most effective at delivering content.
 
 We see significant potential in how \pkg{ari} could expand global 
 learning opportunities. Video narration scripts can be automatically translated into other languages with services like the 
@@ -501,25 +523,15 @@ workflow can greatly expand the potential audience for educational videos with r
 flesh out these workflows so that video creators can manage videos in 
 multiple languages. We hope to add functionality so that communities of 
 learners with language expertise can easily suggest modifications to 
-automatically translated videos, and tooling so suggestions can be incorperated quickly.
+automatically translated videos, and tooling so suggestions can be incorporated quickly.
 
 The workflow we have specified requires many interlocking pieces of 
 software, therefore we have created a Docker environment (https://github.com/seankross/bologna) which contains the required 
 packages to create videos using \pkg{ari}.  This Docker image ensures 
-that our workflow is completely reproducable, and it also enables 
+that our workflow is completely reproducible, and it also enables 
 deployment to multiple disk images for creating lecture videos at scale.
 
 
-## Conclusions
-
-The \pkg{ari} package combines multiple open-source tools and APIs 
-to create reproducible workflows for creating educational lecture 
-videos. These videos can be created using R Markdown documents, 
-PowerPoint presentations, Google Slide decks, or simply a series of 
-images. The source of the audio overlaid on the images can be stored in a separate file or it can be contained within any of the specified file formats. 
-Our workflow ensures thats these videos can then be reproduced in the future and easily updated. Given the content that it is practical to create with 
-this workflow, and the limtted nature of voice synthesis tools, we believe that \pkg{ari} is most appropriate for the production of educational and 
-informational videos.
 
 ```{r, include = FALSE, eval = FALSE}
 # write.bibtex(file = "RJreferences.bib", append = TRUE)
