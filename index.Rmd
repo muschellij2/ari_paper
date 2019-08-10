@@ -124,6 +124,10 @@ The \pkg{text2speech} package provides a unified interface to these 3 text-to-sp
 
 ## Making videos with `ari`
 
+```{r, eval=TRUE, out.width="100%", echo=FALSE}
+knitr::include_graphics("Figure-1-Ari-pdf.pdf")
+```
+
 After Polly has been authenticated, videos can be created using the `ari_spin` function with an ordered set of images and a corresponding ordered set of text strings.  This text is the "script" that is spoken over the images to create the output video.  The number of elements in the text needs to be equal to the number of images.  Let us take a part of Mercutio's speech from Shakespeare's Romeo and Juliet [@shakespeare2003romeo] and overlay it on two images from the Wikipedia page about Mercutio (https://en.wikipedia.org/wiki/Mercutio):
 
 ```{r, echo = TRUE, message=FALSE}
