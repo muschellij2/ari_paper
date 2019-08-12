@@ -2,7 +2,7 @@
 title: "Ari: The Automated R Instructor"
 author:
   - name: Sean Kross
-    affiliation: Cognitive Science, University of California, San Diego
+    affiliation: Department of Cognitive Science, University of California, San Diego
     address:
     - 9500 Gilman Dr. 
     - La Jolla, CA 92093
@@ -160,6 +160,7 @@ The video for this output can be seen at https://youtu.be/3kgaYf-EV90.
 
 ## Synthesizer authentication
 
+<<<<<<< HEAD
 The above example uses `tuneR::noise()` to generate audio and to show that any audio object can be used with \pkg{ari}. In most cases however, \pkg{ari} 
 is most useful when combined with synthesizing audio using a text-to-speech 
 system. Though one can generate the spoken audio in many ways, such as 
@@ -183,13 +184,11 @@ free tiers or limits, such as Amazon Polly's free tier for the first year (https
 
 ## Creating Speech from Text: `ari_spin`
 
-After Polly has been authenticated, videos can be created using the `ari_spin` function with an ordered set of images and a corresponding ordered set 
-of text strings.  This text is the "script" that is spoken over the 
-images to create the output video.  The number of elements in the text 
-needs to be equal to the number of images.  Let us take a part of 
-Mercutio's speech from Shakespeare's Romeo and Juliet [@shakespeare2003romeo] 
-and overlay it on two images from the Wikipedia page about Mercutio
-(https://en.wikipedia.org/wiki/Mercutio):
+```{r, eval=TRUE, out.width="100%", echo=FALSE, fig.cap="Ari is designed to fit into several existing workflows for creating lectures and presentations. Videos can be created with Ari from a series of images and a narrative script, from an R Markdown document, or from a PowerPoint presentation with speaker notes. Ari is pre-configured so that videos are ready to be uploaded to popular platforms like YouTube or Coursera."}
+knitr::include_graphics("Figure-1-Ari-pdf.pdf")
+```
+
+After Polly has been authenticated, videos can be created using the `ari_spin` function with an ordered set of images and a corresponding ordered set of text strings.  This text is the "script" that is spoken over the images to create the output video.  The number of elements in the text needs to be equal to the number of images.  Let us take a part of Mercutio's speech from Shakespeare's Romeo and Juliet [@shakespeare2003romeo] and overlay it on two images from the Wikipedia page about Mercutio (https://en.wikipedia.org/wiki/Mercutio):
 
 ```{r, echo = TRUE, message=FALSE}
 speech =  c(
