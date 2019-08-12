@@ -85,9 +85,16 @@ video can be reproducibly created and automatically updated. Thus,
 \pkg{ari} is the Automated R Instructor. We will provide examples of
 creating videos based on the following sets of source files: a slide
 deck built with R Markdown, a set of images and a script, or a Google
-Slide deck or PowerPoint presentation. We will also demonstrate the
-\CRANpkg{ariExtra}, which contains helper functions extensions of
-\pkg{ari}.
+Slide deck or PowerPoint presentation.\\
+The overview of the processes demonstrated in this paper are seen in
+Figure \ref{fig:fig1}. We will also demonstrate the \CRANpkg{ariExtra},
+which contains helper functions extensions of \pkg{ari}.
+
+\begin{Schunk}
+\begin{figure}
+\includegraphics[width=1\linewidth]{Figure-1-Ari-pdf} \caption[Ari is designed to fit into several existing workflows for creating lectures and presentations]{Ari is designed to fit into several existing workflows for creating lectures and presentations. Videos can be created with Ari from a series of images and a narrative script, from an R Markdown document, or from a PowerPoint presentation with speaker notes. Ari is pre-configured so that videos are ready to be uploaded to popular platforms like YouTube or Coursera.}\label{fig:fig1}
+\end{figure}
+\end{Schunk}
 
 \hypertarget{making-videos-with-ari-ari_stitch}{%
 \subsection{\texorpdfstring{Making videos with \texttt{ari}:
@@ -413,16 +420,16 @@ output. The \texttt{pptx\_to\_ari} function combines the above steps:
 doc = ariExtra::pptx_to_ari(pptx)
 \end{Sinput}
 \begin{Soutput}
-Converting page 1 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//RtmplFUCpv/file7f0135f03341.png... done!
-Converting page 2 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//RtmplFUCpv/file7f012cb50c11.png... done!
+Converting page 1 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//Rtmpo6aD9u/filede6236136195.png... done!
+Converting page 2 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//Rtmpo6aD9u/filede62326b98ef.png... done!
 \end{Soutput}
 \begin{Sinput}
 doc[c("images", "script")]
 \end{Sinput}
 \begin{Soutput}
 $images
-[1] "/private/var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T/RtmplFUCpv/file7f01222b4705_files/slide_1.png"
-[2] "/private/var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T/RtmplFUCpv/file7f01222b4705_files/slide_2.png"
+[1] "/private/var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T/Rtmpo6aD9u/filede6236058cc5_files/slide_1.png"
+[2] "/private/var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T/Rtmpo6aD9u/filede6236058cc5_files/slide_2.png"
 
 $script
 [1] "Sometimes it’s hard for an instructor to take the time to record their lectures.  For example, I’m in a coffee shop and it may be loud."
@@ -471,8 +478,8 @@ is turned on), where we can pass the Google identifier:
 gs_doc = ariExtra::gs_to_ari("14gd2DiOCVKRNpFfLrryrGG7D3S8pu9aZ")
 \end{Sinput}
 \begin{Soutput}
-Converting page 1 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//RtmplFUCpv/file7f0112527fcd.png... done!
-Converting page 2 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//RtmplFUCpv/file7f0166447520.png... done!
+Converting page 1 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//Rtmpo6aD9u/filede6219fd5f9f.png... done!
+Converting page 2 to /var/folders/1s/wrtqcpxn685_zk570bnx9_rr0000gr/T//Rtmpo6aD9u/filede624990cd0d.png... done!
 \end{Soutput}
 \end{Schunk}
 
@@ -681,7 +688,7 @@ The Definitive Guide}. Boca Raton, Florida: Chapman; Hall/CRC.
 
 \address{%
 Sean Kross\\
-Cognitive Science, University of California, San Diego\\
+Department of Cognitive Science, University of California, San Diego\\
 9500 Gilman Dr.\\ La Jolla, CA 92093\\
 }
 \href{mailto:seankross@ucsd.edu}{\nolinkurl{seankross@ucsd.edu}}

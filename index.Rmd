@@ -112,13 +112,16 @@ updated, tracked, and collaboratively or automatically updated with version cont
 a reproducible framework, such as generated using R code, the entire video can be reproducibly created and automatically updated.  Thus, \pkg{ari} is the 
 Automated R Instructor.  We will provide examples of creating videos based 
 on the following sets of source files: a slide deck built with R Markdown, 
-a set of images and a script, or a Google Slide deck or PowerPoint presentation.  We will also demonstrate the \CRANpkg{ariExtra}, which contains helper functions extensions of \pkg{ari}.
+a set of images and a script, or a Google Slide deck or PowerPoint presentation.  
+The overview of the processes demonstrated in this paper are seen in Figure \ref{fig:fig1}.  We will also demonstrate the \CRANpkg{ariExtra}, which contains helper functions extensions of \pkg{ari}.
 
 <!-- `ffmpeg_opts` argument of `ari_stitch`. -->
+```{r fig1, eval=TRUE, out.width="100%", echo=FALSE, fig.cap="Ari is designed to fit into several existing workflows for creating lectures and presentations. Videos can be created with Ari from a series of images and a narrative script, from an R Markdown document, or from a PowerPoint presentation with speaker notes. Ari is pre-configured so that videos are ready to be uploaded to popular platforms like YouTube or Coursera."}
+knitr::include_graphics("Figure-1-Ari-pdf.pdf")
+```
 
 
 ## Making videos with `ari`: `ari_stitch`
-
 The main workhorse of \pkg{ari} is the `ari_stitch` function.  This function 
 requires an ordered set of images and an ordered set of audio 
 objects, either paths to `wav` files or \pkg{tuneR} Wave objects, that correspond to each image. The `ari_stitch` function sequentially 
@@ -160,7 +163,6 @@ The video for this output can be seen at https://youtu.be/3kgaYf-EV90.
 
 ## Synthesizer authentication
 
-<<<<<<< HEAD
 The above example uses `tuneR::noise()` to generate audio and to show that any audio object can be used with \pkg{ari}. In most cases however, \pkg{ari} 
 is most useful when combined with synthesizing audio using a text-to-speech 
 system. Though one can generate the spoken audio in many ways, such as 
@@ -183,10 +185,6 @@ free tiers or limits, such as Amazon Polly's free tier for the first year (https
 
 
 ## Creating Speech from Text: `ari_spin`
-
-```{r, eval=TRUE, out.width="100%", echo=FALSE, fig.cap="Ari is designed to fit into several existing workflows for creating lectures and presentations. Videos can be created with Ari from a series of images and a narrative script, from an R Markdown document, or from a PowerPoint presentation with speaker notes. Ari is pre-configured so that videos are ready to be uploaded to popular platforms like YouTube or Coursera."}
-knitr::include_graphics("Figure-1-Ari-pdf.pdf")
-```
 
 After Polly has been authenticated, videos can be created using the `ari_spin` function with an ordered set of images and a corresponding ordered set of text strings.  This text is the "script" that is spoken over the images to create the output video.  The number of elements in the text needs to be equal to the number of images.  Let us take a part of Mercutio's speech from Shakespeare's Romeo and Juliet [@shakespeare2003romeo] and overlay it on two images from the Wikipedia page about Mercutio (https://en.wikipedia.org/wiki/Mercutio):
 
@@ -414,7 +412,7 @@ cat(show_notes, sep = '\n\n')
 
 The \pkg{ariExtra} package also can combine these processes and take multiple input types (Google Slides, PDFs, PPTX) and harmonize the output.  The `pptx_to_ari` function combines the above steps:
 
-```{r, message=FALSE}
+```{r pptx_to_ari, message=FALSE}
 doc = ariExtra::pptx_to_ari(pptx)
 doc[c("images", "script")]
 ```
@@ -454,7 +452,7 @@ For Google Slides, the slide deck can be downloaded as a PowerPoint and the
 previous steps can be used, however it can also be downloaded directly as 
 a PDF. We will use the same presentation, but uploaded to Google Slides. The \pkg{ariExtra} package has the function `gs_to_ari` to wrap this functionality (as long as link sharing is turned on), where we can pass the Google identifier:
 
-```{r, message=FALSE}
+```{r gs_to_ari, message=FALSE}
 gs_doc = ariExtra::gs_to_ari("14gd2DiOCVKRNpFfLrryrGG7D3S8pu9aZ")
 ```
 
