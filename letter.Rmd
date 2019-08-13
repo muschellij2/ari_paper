@@ -1,0 +1,41 @@
+---
+output: pdf_document
+---
+
+To members of the Editorial Board of the R Journal: 
+
+Thank you for considering our submission *Ari: The Automated R Instructor*. In
+accordance with the instructions for submission of papers describing add-on
+packages, we include this rationale of why our package `ari` presents a novel
+use of R, and how `ari` invites re-use of the package. We also believe that this
+work inspires thought about how artifacts that are commonly produced using the
+R language like computational narratives and data visualizations can be remixed
+and reused to reach new audiences in new forms of media.
+
+It is undeniable that computational notebooks are having an unprecedented
+effect on how science is being recorded, how data is being analyzed, and how 
+scientists are communicating their results and insights. For the R
+community, our computational notebook is the R Markdown document. R Markdown
+started as literate programming framework, allowing users to intertwine prose,
+code, tables, and graphics. In the years since its introduction it
+has been adapted as a raw, plain-text format which can be used to create
+webpages, academic papers, slide presentations, and interactive dashboards.
+
+We present `ari` as the next evolution in reproducible scientific communication
+based on plain text formats like R Markdown. The `ari` package transforms
+R Markdown documents, PowerPoint presentations, PDFs, and several other file
+types into narrated videos that are optimized to be shared on social platforms
+like YouTube or on educational sites like Coursera. We designed `ari` to fit
+into communication workflows that scientists and R users commonly use, which
+leads us to believe that `ari` has significant potential for re-use and
+integration into new R and R Markdown based workflows. Video production in R
+is a nascent field, however the growth of the popularity of video on the
+internet, especially as a teaching tool, indicates that there is a large
+potential audience for video and audio tools in the R programming community.
+Based on this potential, we believe that `ari`, and the enclosed deomstration 
+and explanation merits consideration as a noteworthy project in the interest
+of the R community.
+
+Thank you and sincerely,
+
+Sean Kross, John Muschelli, and Jeffrey T. Leek
