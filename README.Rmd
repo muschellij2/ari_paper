@@ -38,7 +38,7 @@ attributes(result)$outfile
 ```
 
 ```{r, eval = TRUE, echo = FALSE}
-video::video("noise.mp4")
+video::video("noise.mp4", elementId = "noise-video")
 ```
 
 
