@@ -28,7 +28,7 @@ types into narrated videos that are optimized to be shared on social platforms
 like YouTube or on educational sites like Coursera. We designed `ari` to fit
 into communication workflows that scientists and R users commonly use, which
 leads us to believe that `ari` has significant potential for re-use and
-integration into new R and R Markdown based workflows. Video production in R
+integration into new R and R Markdown based workflows. Moreover, in the `ariExtra` package, an extension of `ari`, discussed within, has an `ari_document` output type, which can be rendered in RStudio and with the `rmarkdown` package, thus fitting in the R Markdown framework.  Video production in R
 is a nascent field, however the growth of the popularity of video on the
 internet, especially as a teaching tool, indicates that there is a large
 potential audience for video and audio tools in the R programming community.
