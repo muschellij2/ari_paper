@@ -1,4 +1,4 @@
-all: index.html RJwrapper.pdf README.html README.md
+all: index.html RJwrapper.pdf README.html README.md letter.pdf
 
 RJwrapper.pdf: index.Rmd
 	Rscript -e "rmarkdown::render('index.Rmd')"
@@ -11,4 +11,7 @@ README.html: README.Rmd
 
 README.md: README.Rmd
 	Rscript -e "rmarkdown::render('README.Rmd')"
+
+letter.pdf: letter.Rmd
+	Rscript -e "rmarkdown::render('letter.Rmd')"		
 
